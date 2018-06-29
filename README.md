@@ -7,7 +7,7 @@ limelight XML suitable for import into the limelight web application.
 How To Run
 -------------
 1. Download the [latest release](https://github.com/yeastrc/limelight-import-comet-tpp/releases).
-2. Run the program ``java -jar cometTPP2LimelightXML.jar`` with no arguments to see the possible parameters.
+2. Run the program ``java -jar cometTPP2LimelightXML.jar`` with no arguments to see the possible parameters. Requires Java 8 or higher.
 
 Command line documentation
 ---------------------------
