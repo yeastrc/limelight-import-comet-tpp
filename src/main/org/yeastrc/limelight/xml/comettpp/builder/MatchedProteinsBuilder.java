@@ -103,6 +103,7 @@ public class MatchedProteinsBuilder {
 		
 		// get a unique set of naked peptide sequence
 		Collection<String> nakedPeptideSequences = getNakedPeptideSequences( reportedPeptides );
+		Collection<String> remainingPeptideSequences = new HashSet<>( nakedPeptideSequences );
 		
 		Map<String, Collection<FastaProteinAnnotation>> proteinAnnotations = new HashMap<>();
 		
@@ -138,6 +139,8 @@ public class MatchedProteinsBuilder {
 
 						}//end iterating over fasta headers
 						
+						remainingPeptideSequences.remove( nakedSequence );
+						
 						break;// no need to check more peptides for this protein, we found one						
 
 					} // end if statement for protein containing peptide
@@ -145,6 +148,15 @@ public class MatchedProteinsBuilder {
 				} // end iterating over peptide sequences
 				
 			}// end iterating over fasta entries
+			
+			
+			if( remainingPeptideSequences.size() > 0 ) {
+				System.err.println( "\nError: Not all peptides in the results could be matched to a protein in the FASTA file." );
+				System.err.println( "\tUnmatched peptides:" );
+				for( String s : remainingPeptideSequences ) {
+					System.err.println( "\t\t" + s );
+				}
+			}
 			
 			System.err.print( "\n" );
 			
