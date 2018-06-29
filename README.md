@@ -1,0 +1,27 @@
+Comet/TPP to limelight XML Converter
+=======================================
+
+Use this program to convert the results of a Comet/TPP analysis to
+limelight XML suitable for import into the limelight web application.
+
+How To Run
+-------------
+1. Download the [latest release](https://github.com/yeastrc/limelight-import-comet-tpp/releases).
+2. Run the program ``java -jar cometTPP2LimelightXML.jar`` with no arguments to see the possible parameters.
+
+Command line documentation
+---------------------------
+
+Usage: java -jar cometTPP2LimelightXML.jar.jar -c path -p path -f path -o path
+
+Example: java -jar magnum2LimelightXML.jar -c /path/to/comet.params
+                                       -o /path/to/output.limelight.xml
+                                       -p /path/to/pepXML.xml
+                                       -f /path/to/fasta.fa
+
+Options:
+        -c      [Required] Full path to comet .params file
+        -o      [Required] Full path to use for the limelight XML output file
+        -f      [Required] Full path to FASTA file used in the experiment.
+        -p      [Required] Full path to pepXML file
+

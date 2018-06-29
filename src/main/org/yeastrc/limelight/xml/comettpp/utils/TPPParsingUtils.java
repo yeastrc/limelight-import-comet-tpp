@@ -58,11 +58,15 @@ public class TPPParsingUtils {
 		
 		for( AnalysisSummary analysisSummary : msAnalysis.getAnalysisSummary() ) {
 			
-			try {
-				PeptideprophetSummary pps = (PeptideprophetSummary)analysisSummary.getAny();
-				return pps.getVersion();
-			} catch( Throwable t ) { ; }
+			for( Object o : analysisSummary.getAny() ) {
+			
+				try {
+					PeptideprophetSummary pps = (PeptideprophetSummary)o;
+					return pps.getVersion();
 
+				} catch( Throwable t ) { ; }
+				
+			}
 		}
 		
 		return "Unknown";
