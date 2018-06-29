@@ -35,54 +35,17 @@ public class ConversionParameters {
 		this.fastaFile = fastaFile;
 	}
 	/**
-	 * @return the magnumParametersFile
+	 * @return the cometParametersFile
 	 */
-	public File getMagnumParametersFile() {
-		return magnumParametersFile;
+	public File getCometParametersFile() {
+		return cometParametersFile;
 	}
 	/**
-	 * @param magnumParametersFile the magnumParametersFile to set
+	 * @param cometParametersFile the cometParametersFile to set
 	 */
-	public void setMagnumParametersFile(File magnumParametersFile) {
-		this.magnumParametersFile = magnumParametersFile;
+	public void setCometParametersFile(File cometParametersFile) {
+		this.cometParametersFile = cometParametersFile;
 	}
-	/**
-	 * @return the percolatorXMLOutputFile
-	 */
-	public File getPercolatorXMLOutputFile() {
-		return percolatorXMLOutputFile;
-	}
-	/**
-	 * @param percolatorXMLOutputFile the percolatorXMLOutputFile to set
-	 */
-	public void setPercolatorXMLOutputFile(File percolatorXMLOutputFile) {
-		this.percolatorXMLOutputFile = percolatorXMLOutputFile;
-	}
-	/**
-	 * @return the magnumOutputFile
-	 */
-	public File getMagnumOutputFile() {
-		return magnumOutputFile;
-	}
-	/**
-	 * @param magnumOutputFile the magnumOutputFile to set
-	 */
-	public void setMagnumOutputFile(File magnumOutputFile) {
-		this.magnumOutputFile = magnumOutputFile;
-	}
-	
-	/**
-	 * @return the conversionProgramInfo
-	 */
-	public ConversionProgramInfo getConversionProgramInfo() {
-		return conversionProgramInfo;
-	}
-	/**
-	 * @param conversionProgramInfo the conversionProgramInfo to set
-	 */
-	public void setConversionProgramInfo(ConversionProgramInfo conversionProgramInfo) {
-		this.conversionProgramInfo = conversionProgramInfo;
-	}	
 	/**
 	 * @return the limelightXMLOutputFile
 	 */
@@ -95,14 +58,35 @@ public class ConversionParameters {
 	public void setLimelightXMLOutputFile(File limelightXMLOutputFile) {
 		this.limelightXMLOutputFile = limelightXMLOutputFile;
 	}
-
-
-
+	/**
+	 * @return the pepXMLFile
+	 */
+	public File getPepXMLFile() {
+		return pepXMLFile;
+	}
+	/**
+	 * @param pepXMLFile the pepXMLFile to set
+	 */
+	public void setPepXMLFile(File pepXMLFile) {
+		this.pepXMLFile = pepXMLFile;
+	}
+	/**
+	 * @return the conversionProgramInfo
+	 */
+	public ConversionProgramInfo getConversionProgramInfo() {
+		return conversionProgramInfo;
+	}
+	/**
+	 * @param conversionProgramInfo the conversionProgramInfo to set
+	 */
+	public void setConversionProgramInfo(ConversionProgramInfo conversionProgramInfo) {
+		this.conversionProgramInfo = conversionProgramInfo;
+	}
+	
 	private File fastaFile;
-	private File magnumParametersFile;
-	private File percolatorXMLOutputFile;
-	private File magnumOutputFile;
+	private File cometParametersFile;
 	private File limelightXMLOutputFile;
+	private File pepXMLFile;
 	private ConversionProgramInfo conversionProgramInfo;
 	
 }

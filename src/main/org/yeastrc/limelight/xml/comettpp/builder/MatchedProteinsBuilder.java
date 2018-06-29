@@ -42,6 +42,7 @@ public class MatchedProteinsBuilder {
 	 */
 	public void buildMatchedProteins( LimelightInput limelightInputRoot, File fastaFile, Collection<TPPReportedPeptide> reportedPeptides ) throws Exception {
 		
+		System.err.print( " Matching peptides to proteins..." );
 
 		// the proteins we've found
 		Map<String, Collection<FastaProteinAnnotation>> proteins = getProteins( reportedPeptides, fastaFile );
@@ -110,9 +111,14 @@ public class MatchedProteinsBuilder {
 		try {
 			
 			fastaReader = FASTAReader.getInstance( fastaFile );
-			
+			int count = 0;
+			System.err.println( "" );
+
 			for( FASTAEntry entry = fastaReader.readNext(); entry != null; entry = fastaReader.readNext() ) {
 
+				count++;
+				System.err.print( "\tTested " + count + " FASTA entries...\r" );
+				
 				for( String nakedSequence : nakedPeptideSequences ) {
 					
 					if( ProteinInferenceUtils.proteinContainsReportedPeptide( entry.getSequence(), nakedSequence ) ) {
@@ -139,6 +145,8 @@ public class MatchedProteinsBuilder {
 				} // end iterating over peptide sequences
 				
 			}// end iterating over fasta entries
+			
+			System.err.print( "\n" );
 			
 			
 		} finally {

@@ -1,5 +1,6 @@
 package org.yeastrc.limelight.xml.comettpp.annotation;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,11 +101,11 @@ public class PSMAnnotationTypes {
 				type.setName( PPROPHET_ANNOTATION_TYPE_FDR );
 				type.setDescription( "Calculated FDR from Probability Score" );
 				type.setFilterDirection( FilterDirectionType.BELOW );
+				type.setDefaultFilterValue( new BigDecimal( "0.01" ) );
 	
 				types.add( type );
 			}
 		}
-
 		
 		return types;
 	}

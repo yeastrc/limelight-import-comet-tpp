@@ -1,6 +1,9 @@
 package org.yeastrc.limelight.xml.comettpp.reader;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,8 +12,30 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
+
 public class CometParamsReader {
 
+	/**
+	 * Get the relevant parameters from the magnum params file
+	 * 
+	 * @param paramsFile
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static CometParameters getCometParameters( File paramsFile ) throws FileNotFoundException, IOException {
+		
+		CometParameters magParams = new CometParameters();
+		
+		try ( InputStream is = new FileInputStream( paramsFile ) ) {
+			magParams.setStaticMods( getStaticModsFromParamsFile( is ) );
+		}
+		
+		
+		return magParams;
+	}
+	
 	public static Map<Character, Double> getStaticModsFromParamsFile( InputStream paramsInputStream ) throws IOException {
 		
 		Map<Character, Double> staticMods = new HashMap<>();

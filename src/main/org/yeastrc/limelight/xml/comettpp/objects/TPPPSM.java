@@ -24,6 +24,7 @@ public class TPPPSM {
 	
 	private Map<Integer,BigDecimal> modifications;
 	
+	private BigDecimal fdr;
 	
 	/**
 	 * @return the xCorr
@@ -192,6 +193,18 @@ public class TPPPSM {
 	 */
 	public void setModifications(Map<Integer, BigDecimal> modifications) {
 		this.modifications = modifications;
+	}
+	/**
+	 * @return the fdr
+	 */
+	public BigDecimal getFdr() {
+		return fdr;
+	}
+	/**
+	 * @param fdr the fdr to set
+	 */
+	public void setFdr(BigDecimal fdr) {
+		this.fdr = fdr;
 	}
 	
 	

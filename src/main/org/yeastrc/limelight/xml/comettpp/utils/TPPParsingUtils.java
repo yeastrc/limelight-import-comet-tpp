@@ -125,7 +125,9 @@ public class TPPParsingUtils {
 	}
 	
 	/**
-	 * Get a TPPPSM (psm object) from the supplied searchHit JAXB object
+	 * Get a TPPPSM (psm object) from the supplied searchHit JAXB object.
+	 * 
+	 * If the searchHit has no peptideprophet score, null is returned.
 	 * 
 	 * @param spectrumQuery
 	 * @return
@@ -136,7 +138,7 @@ public class TPPParsingUtils {
 			int scanNumber,
 			BigDecimal obsMass,
 			BigDecimal retentionTime ) throws Throwable {
-		
+				
 		TPPPSM psm = new TPPPSM();
 		
 		psm.setCharge( charge );
@@ -154,6 +156,9 @@ public class TPPParsingUtils {
 		psm.seteValue( getScoreForType( searchHit, "expect" ) );
 
 		psm.setPpProbability( getPeptideProphetProbabilityForSearchHit( searchHit ) );
+		if( psm.getPpProbability() == null ) {
+			return null;
+		}
 		
 		
 		try {
@@ -175,18 +180,19 @@ public class TPPParsingUtils {
 	 */
 	public static BigDecimal getPeptideProphetProbabilityForSearchHit( SearchHit searchHit ) throws Exception {
 		
+		
 		for( AnalysisResult ar : searchHit.getAnalysisResult() ) {
 			if( ar.getAnalysis().equals( "peptideprophet" ) ) {
 				
 				for( Object o : ar.getAny() ) {
-
+					
 					try {
 						
 						PeptideprophetResult ppr = (PeptideprophetResult)o;
 						return ppr.getProbability();
 						
 					} catch( Throwable t ) {
-						;
+						
 					}
 					
 				}
@@ -194,7 +200,7 @@ public class TPPParsingUtils {
 			}
 		}
 		
-		throw new Exception( "Could not find a peptide prophet probability for psm..." );
+		return null;
 	}
 	
 	/**

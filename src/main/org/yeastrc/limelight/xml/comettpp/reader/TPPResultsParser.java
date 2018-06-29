@@ -76,6 +76,7 @@ public class TPPResultsParser {
 						TPPPSM psm = null;
 						
 						try {
+							
 							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime );
 							
 						} catch( Throwable t) {
@@ -85,12 +86,14 @@ public class TPPResultsParser {
 							
 						}
 						
-						TPPReportedPeptide tppRp = ReportedPeptideUtils.getTPPReportedPeptideForTPPPSM( psm );
-						
-						if( !results.getPeptidePSMMap().containsKey( tppRp ) )
-							results.getPeptidePSMMap().put( tppRp, new HashMap<>() );
-						
-						results.getPeptidePSMMap().get( tppRp ).put( psm.getScanNumber(), psm );
+						if( psm != null ) {
+							TPPReportedPeptide tppRp = ReportedPeptideUtils.getTPPReportedPeptideForTPPPSM( psm );
+							
+							if( !results.getPeptidePSMMap().containsKey( tppRp ) )
+								results.getPeptidePSMMap().put( tppRp, new HashMap<>() );
+							
+							results.getPeptidePSMMap().get( tppRp ).put( psm.getScanNumber(), psm );
+						}
 					}
 				}
 			}
