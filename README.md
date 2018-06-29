@@ -4,6 +4,8 @@ Comet/TPP to limelight XML Converter
 Use this program to convert the results of a Comet/TPP analysis to
 limelight XML suitable for import into the limelight web application.
 
+Tested on Comet version 2017.01 rev. 3 and TPP v5.0.0
+
 How To Run
 -------------
 1. Download the [latest release](https://github.com/yeastrc/limelight-import-comet-tpp/releases).
