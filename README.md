@@ -23,8 +23,8 @@ Example: java -jar magnum2LimelightXML.jar -c /path/to/comet.params
 
 Options:
 ```
-        -c      [Required] Full path to comet .params file
-        -o      [Required] Full path to use for the limelight XML output file
-        -f      [Required] Full path to FASTA file used in the experiment.
-        -p      [Required] Full path to pepXML file
+        -c      [Required] Path to comet .params file
+        -o      [Required] Path to use for the limelight XML output file
+        -f      [Required] Path to FASTA file used in the experiment.
+        -p      [Required] Path to pepXML file
 ```
