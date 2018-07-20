@@ -48,6 +48,7 @@ public class PeptideProphetErrorAnalyzer {
 				
 				psc.setpCount( psc.getpCount() + score.doubleValue() );
 				psc.setOneMinusPCount( psc.getOneMinusPCount() + ( 1.0 - score.doubleValue() ) );
+				psc.setTotalCount( psc.getTotalCount() + 1 );
 			}
 		}
 		

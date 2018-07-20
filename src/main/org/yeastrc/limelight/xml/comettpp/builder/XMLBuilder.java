@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.yeastrc.limelight.limelight_import.api.xml_dto.AnnotationSortOrder;
 import org.yeastrc.limelight.limelight_import.api.xml_dto.ConfigurationFile;
@@ -157,6 +159,8 @@ public class XMLBuilder {
 			}
 		}
 		
+		// cache of FDRs calculated for specific PSM probabilities
+		Map<BigDecimal, BigDecimal> psmFDRCache = new HashMap<>();
 		
 		//
 		// Define the peptide and PSM data
@@ -273,13 +277,24 @@ public class XMLBuilder {
 					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
 					xmlFilterablePsmAnnotation.setValue( psm.getPpProbability() );
 				}
+				
+				
 				{
 					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
 					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
 
 					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_FDR );
 					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
-					xmlFilterablePsmAnnotation.setValue( errorAnalysis.getError( psm.getPpProbability() ) );
+					
+					BigDecimal error = null;
+					if( psmFDRCache.containsKey( psm.getPpProbability() ) ) {
+						error = psmFDRCache.get( psm.getPpProbability() );
+					} else {
+						error = errorAnalysis.getError( psm.getPpProbability() );
+						psmFDRCache.put( psm.getPpProbability(), error );
+					}
+					
+					xmlFilterablePsmAnnotation.setValue( error );
 				}
 				
 			}// end iterating over psms for a reported peptide

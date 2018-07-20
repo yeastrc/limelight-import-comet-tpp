@@ -72,7 +72,12 @@ public class TPPResultsParser {
 				
 				for( SearchResult searchResult : spectrumQuery.getSearchResult() ) {
 					for( SearchHit searchHit : searchResult.getSearchHit() ) {
-
+						
+						// do not include decoy hits
+						if( TPPParsingUtils.searchHitIsDecoy( searchHit ) ) {
+							continue;
+						}
+						
 						TPPPSM psm = null;
 						
 						try {

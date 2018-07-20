@@ -6,23 +6,37 @@ import java.util.Map;
 public class PeptideProphetErrorAnalysis {
 
 	/**
-	 * Get the error ( numincorr / ( numincorr + numcorr) ) associated with a given probability score, as calculated
-	 * by the TPP
+	 * Get the error ( sum of 1-p for this probability or better / total count
+	 * of hits with this probability or better )
 	 * 
 	 * @param score
-	 * @return
 	 * @throws Exception
 	 */
 	public BigDecimal getError( BigDecimal score ) throws Exception {
 		
-		if( this.probabilitySums == null )
-			throw new Exception( "Must call performAnalysis() first." );
+		//System.out.println( score );
+
 		
 		if( !this.probabilitySums.containsKey( score ) )
 			throw new Exception( "The score: " + score + " was not found in this search." );
 		
-		ProbabilitySumCounter psc = this.probabilitySums.get( score );
-		double error = (double)psc.getOneMinusPCount() / ( psc.getpCount() + psc.getOneMinusPCount() );
+		double totalCount = 0;
+		double oneMinusPSum = 0;
+		
+		for( BigDecimal testScore : this.getProbabilitySums().keySet() ) {
+			
+			
+			if( testScore.compareTo( score ) >= 0 ) {
+				
+				totalCount += this.probabilitySums.get( testScore ).getTotalCount();
+				oneMinusPSum += this.probabilitySums.get( testScore ).getOneMinusPCount();
+				
+				//System.out.println( totalCount + " " + oneMinusPSum );
+				
+			}
+		}
+		
+		double error = oneMinusPSum / totalCount;
 		
 		BigDecimal retValue = BigDecimal.valueOf( error );
 		retValue = retValue.setScale(4, BigDecimal.ROUND_HALF_EVEN);

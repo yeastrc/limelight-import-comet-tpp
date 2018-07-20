@@ -141,8 +141,6 @@ public class MatchedProteinsBuilder {
 						
 						remainingPeptideSequences.remove( nakedSequence );
 						
-						break;// no need to check more peptides for this protein, we found one						
-
 					} // end if statement for protein containing peptide
 
 				} // end iterating over peptide sequences

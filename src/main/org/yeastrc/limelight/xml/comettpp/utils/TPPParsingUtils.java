@@ -12,6 +12,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 
+import net.systemsbiology.regis_web.pepxml.AltProteinDataType;
 import net.systemsbiology.regis_web.pepxml.ModInfoDataType;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis;
 import net.systemsbiology.regis_web.pepxml.NameValueType;
@@ -70,6 +71,32 @@ public class TPPParsingUtils {
 		}
 		
 		return "Unknown";
+	}
+
+	/**
+	 * Return true if this searchHit is a decoy. This means that it only matches
+	 * decoy proteins.
+	 * 
+	 * @param searchHit
+	 * @return
+	 */
+	public static boolean searchHitIsDecoy( SearchHit searchHit ) {
+		
+		String protein = searchHit.getProtein();
+		if( protein.startsWith( "DECOY_" ) ) {
+			
+			if( searchHit.getAlternativeProtein() != null ) {
+				for( AltProteinDataType ap : searchHit.getAlternativeProtein() ) {
+					if( !ap.getProtein().startsWith( "DECOY_" ) ) {
+						return false;
+					}
+				}
+			}
+			
+			return true;			
+		}
+		
+		return false;
 	}
 	
 	/**
