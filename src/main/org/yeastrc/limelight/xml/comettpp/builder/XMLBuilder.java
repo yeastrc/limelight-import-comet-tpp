@@ -108,6 +108,12 @@ public class XMLBuilder {
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
 			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PEPTIDEPROPHET ) ) {
+				
+				// disable default filter on ppro FDR if ipro data are available
+				if( annoType.getName().equals( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_FDR ) && tppResults.isHasIProphetResults() ) {
+					annoType.setDefaultFilterValue( null );
+				}
+				
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 
