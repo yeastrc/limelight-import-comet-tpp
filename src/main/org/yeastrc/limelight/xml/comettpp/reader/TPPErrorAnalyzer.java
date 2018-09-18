@@ -16,14 +16,17 @@ import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
  * @author mriffle
  *
  */
-public class PeptideProphetErrorAnalyzer {
+public class TPPErrorAnalyzer {
 
+	public static final int TYPE_PEPTIDE_PROPHET = 0;
+	public static final int TYPE_INTER_PROPHET = 1;
+	
 	/**
 	 * Analyze the target/decoy counts in the analysis
 	 * 
 	 * @throws Exception
 	 */
-	public static PeptideProphetErrorAnalysis performAnalysis( TPPResults results ) throws Exception {
+	public static TPPErrorAnalysis performPeptideProphetAnalysis( TPPResults results, int type ) throws Exception {
 		
 		Map<BigDecimal, ProbabilitySumCounter> probabilitySums = new HashMap<BigDecimal, ProbabilitySumCounter>();
 		
@@ -36,7 +39,19 @@ public class PeptideProphetErrorAnalyzer {
 							
 				TPPPSM psm = results.getPeptidePSMMap().get( tppRp ).get( scanNumber );
 				
-				BigDecimal score = psm.getPpProbability();
+				BigDecimal score;
+				
+				if( type == TYPE_PEPTIDE_PROPHET ) {
+					score = psm.getPeptideProphetProbability();
+				
+				} else if( type == TYPE_INTER_PROPHET ) {
+					score = psm.getInterProphetProbability();
+					
+				} else {
+					throw new RuntimeException( "Got an invalid type." );
+				}
+				
+				
 				ProbabilitySumCounter psc = null;
 				
 				if( probabilitySums.containsKey( score ) ) {
@@ -52,7 +67,7 @@ public class PeptideProphetErrorAnalyzer {
 			}
 		}
 		
-		PeptideProphetErrorAnalysis ppa = new PeptideProphetErrorAnalysis();
+		TPPErrorAnalysis ppa = new TPPErrorAnalysis();
 		ppa.setProbabilitySums( probabilitySums );
 		
 		return ppa;

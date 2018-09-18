@@ -22,9 +22,10 @@ public class AnalysisParameters {
 	public void setPepXMLFile(File pepXMLFile) {
 		this.pepXMLFile = pepXMLFile;
 	}
-	
+
+
 	private File fastaFile;
 	private File cometParametersFile;
 	private File pepXMLFile;
-	
+		
 }

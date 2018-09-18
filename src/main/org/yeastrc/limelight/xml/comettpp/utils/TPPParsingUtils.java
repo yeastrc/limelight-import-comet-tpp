@@ -13,6 +13,8 @@ import javax.xml.bind.Unmarshaller;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 
 import net.systemsbiology.regis_web.pepxml.AltProteinDataType;
+import net.systemsbiology.regis_web.pepxml.InterprophetResult;
+import net.systemsbiology.regis_web.pepxml.InterprophetSummary;
 import net.systemsbiology.regis_web.pepxml.ModInfoDataType;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis;
 import net.systemsbiology.regis_web.pepxml.NameValueType;
@@ -50,17 +52,25 @@ public class TPPParsingUtils {
 	}
 	
 	/**
-	 * Attempt to get the peptideprophet version from the pepXML. Returns "Unknown" if not found.
+	 * Attempt to get the TPP version from the pepXML. Returns "Unknown" if not found.
 	 * 
 	 * @param msAnalysis
 	 * @return
 	 */
-	public static String getPeptideProphetVersionFromXML( MsmsPipelineAnalysis msAnalysis ) {
+	public static String getTPPVersionFromXML( MsmsPipelineAnalysis msAnalysis ) {
 		
 		for( AnalysisSummary analysisSummary : msAnalysis.getAnalysisSummary() ) {
 			
 			for( Object o : analysisSummary.getAny() ) {
 			
+				// if iProphet was run, get version from its summary
+				try {
+					InterprophetSummary pps = (InterprophetSummary)o;
+					return pps.getVersion();
+
+				} catch( Throwable t ) { ; }
+				
+				// if iProphet was not run, get version from peptideprophet summary
 				try {
 					PeptideprophetSummary pps = (PeptideprophetSummary)o;
 					return pps.getVersion();
@@ -72,6 +82,31 @@ public class TPPParsingUtils {
 		
 		return "Unknown";
 	}
+	
+	/**
+	 * Return true if the results can be expected to have iProphet data, false otherwise.
+	 * 
+	 * @param msAnalysis
+	 * @return
+	 */
+	public static boolean getHasIProphetData( MsmsPipelineAnalysis msAnalysis ) {
+		
+		for( AnalysisSummary analysisSummary : msAnalysis.getAnalysisSummary() ) {
+			
+			for( Object o : analysisSummary.getAny() ) {
+			
+				try {
+					InterprophetSummary pps = (InterprophetSummary)o;
+					return true;
+
+				} catch( Throwable t ) { ; }				
+				
+			}
+		}
+		
+		return false;
+	}
+	
 
 	/**
 	 * Return true if this searchHit is a decoy. This means that it only matches
@@ -186,11 +221,16 @@ public class TPPParsingUtils {
 		psm.setSpRank( getScoreForType( searchHit, "sprank" ) );
 		psm.seteValue( getScoreForType( searchHit, "expect" ) );
 
-		psm.setPpProbability( getPeptideProphetProbabilityForSearchHit( searchHit ) );
-		if( psm.getPpProbability() == null ) {
+		psm.setPeptideProphetProbability( getPeptideProphetProbabilityForSearchHit( searchHit ) );
+		
+		
+		if( psm.getPeptideProphetProbability() == null ) {
 			return null;
 		}
 		
+		// this will set this to null if this was not an iProphet run
+		psm.setInterProphetProbability( getInterProphetProbabilityForSearchHit( searchHit ) );
+
 		
 		try {
 			psm.setModifications( getModificationsForSearchHit( searchHit ) );
@@ -233,6 +273,39 @@ public class TPPParsingUtils {
 		
 		return null;
 	}
+	
+	/**
+	 * Get a PeptideProphet probability from the supplied searchHit JAXB object
+	 * 
+	 * @param spectrumQuery
+	 * @return
+	 */
+	public static BigDecimal getInterProphetProbabilityForSearchHit( SearchHit searchHit ) throws Exception {
+		
+		
+		for( AnalysisResult ar : searchHit.getAnalysisResult() ) {
+			if( ar.getAnalysis().equals( "interprophet" ) ) {
+				
+				for( Object o : ar.getAny() ) {
+					
+					try {
+						
+						InterprophetResult ppr = (InterprophetResult)o;
+						return ppr.getProbability();
+						
+					} catch( Throwable t ) {
+						
+					}
+					
+				}
+				
+			}
+		}
+		
+		return null;
+	}
+	
+	
 	
 	/**
 	 * Get the requested score from the searchHit JAXB object

@@ -11,7 +11,10 @@ public class TPPPSM {
 	private BigDecimal spScore;
 	private BigDecimal spRank;
 	private BigDecimal eValue;
-	private BigDecimal ppProbability;
+	
+	private BigDecimal peptideProphetProbability;
+	private BigDecimal interProphetProbability;
+	
 	private int hitRank;
 	
 	
@@ -24,7 +27,8 @@ public class TPPPSM {
 	
 	private Map<Integer,BigDecimal> modifications;
 	
-	private BigDecimal fdr;
+	private BigDecimal peptideProphetFDR;
+	private BigDecimal interProphetFDR;
 	
 	/**
 	 * @return the xCorr
@@ -98,18 +102,7 @@ public class TPPPSM {
 	public void seteValue(BigDecimal eValue) {
 		this.eValue = eValue;
 	}
-	/**
-	 * @return the ppProbability
-	 */
-	public BigDecimal getPpProbability() {
-		return ppProbability;
-	}
-	/**
-	 * @param ppProbability the ppProbability to set
-	 */
-	public void setPpProbability(BigDecimal ppProbability) {
-		this.ppProbability = ppProbability;
-	}
+	
 	/**
 	 * @return the hitRank
 	 */
@@ -194,18 +187,31 @@ public class TPPPSM {
 	public void setModifications(Map<Integer, BigDecimal> modifications) {
 		this.modifications = modifications;
 	}
-	/**
-	 * @return the fdr
-	 */
-	public BigDecimal getFdr() {
-		return fdr;
+	public BigDecimal getPeptideProphetFDR() {
+		return peptideProphetFDR;
 	}
-	/**
-	 * @param fdr the fdr to set
-	 */
-	public void setFdr(BigDecimal fdr) {
-		this.fdr = fdr;
+	public void setPeptideProphetFDR(BigDecimal peptideProphetFDR) {
+		this.peptideProphetFDR = peptideProphetFDR;
 	}
+	public BigDecimal getInterProphetFDR() {
+		return interProphetFDR;
+	}
+	public void setInterProphetFDR(BigDecimal interProphetFDR) {
+		this.interProphetFDR = interProphetFDR;
+	}
+	public BigDecimal getPeptideProphetProbability() {
+		return peptideProphetProbability;
+	}
+	public void setPeptideProphetProbability(BigDecimal peptideProphetProbability) {
+		this.peptideProphetProbability = peptideProphetProbability;
+	}
+	public BigDecimal getInterProphetProbability() {
+		return interProphetProbability;
+	}
+	public void setInterProphetProbability(BigDecimal interProphetProbability) {
+		this.interProphetProbability = interProphetProbability;
+	}
+
 	
 	
 }

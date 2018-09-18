@@ -42,14 +42,15 @@ import org.yeastrc.limelight.xml.comettpp.objects.ConversionParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPReportedPeptide;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
-import org.yeastrc.limelight.xml.comettpp.reader.PeptideProphetErrorAnalysis;
+import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalysis;
 
 public class XMLBuilder {
 
 	public void buildAndSaveXML( ConversionParameters conversionParameters,
 			                     TPPResults tppResults,
 			                     CometParameters cometParameters,
-			                     PeptideProphetErrorAnalysis errorAnalysis )
+			                     TPPErrorAnalysis ppErrorAnalysis,
+			                     TPPErrorAnalysis ipErrorAnalysis )
     throws Exception {
 
 		LimelightInput limelightInputRoot = new LimelightInput();
@@ -65,13 +66,36 @@ public class XMLBuilder {
 		SearchPrograms searchPrograms = new SearchPrograms();
 		searchProgramInfo.setSearchPrograms( searchPrograms );
 		
+		if( tppResults.isHasIProphetResults() ) {
+			SearchProgram searchProgram = new SearchProgram();
+			searchPrograms.getSearchProgram().add( searchProgram );
+				
+			searchProgram.setName( Constants.PROGRAM_NAME_INTERPROPHET );
+			searchProgram.setDisplayName( Constants.PROGRAM_NAME_INTERPROPHET );
+			searchProgram.setVersion( tppResults.getTppVersion() );
+			
+			
+			//
+			// Define the annotation types present in peptideprophet data
+			//
+			PsmAnnotationTypes psmAnnotationTypes = new PsmAnnotationTypes();
+			searchProgram.setPsmAnnotationTypes( psmAnnotationTypes );
+			
+			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
+			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
+			
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_INTERPROPHET ) ) {
+				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
+			}
+		}
+		
 		{
 			SearchProgram searchProgram = new SearchProgram();
 			searchPrograms.getSearchProgram().add( searchProgram );
 				
 			searchProgram.setName( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
 			searchProgram.setDisplayName( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
-			searchProgram.setVersion( tppResults.getPeptideProphetVersion() );
+			searchProgram.setVersion( tppResults.getTppVersion() );
 			
 			
 			//
@@ -137,7 +161,7 @@ public class XMLBuilder {
 		PsmAnnotationSortOrder xmlPsmAnnotationSortOrder = new PsmAnnotationSortOrder();
 		xmlAnnotationSortOrder.setPsmAnnotationSortOrder( xmlPsmAnnotationSortOrder );
 		
-		for( SearchAnnotation xmlSearchAnnotation : PSMAnnotationTypeSortOrder.getPSMAnnotationTypeSortOrder() ) {
+		for( SearchAnnotation xmlSearchAnnotation : PSMAnnotationTypeSortOrder.getPSMAnnotationTypeSortOrder( tppResults.isHasIProphetResults() ) ) {
 			xmlPsmAnnotationSortOrder.getSearchAnnotation().add( xmlSearchAnnotation );
 		}
 		
@@ -160,7 +184,8 @@ public class XMLBuilder {
 		}
 		
 		// cache of FDRs calculated for specific PSM probabilities
-		Map<BigDecimal, BigDecimal> psmFDRCache = new HashMap<>();
+		Map<BigDecimal, BigDecimal> ppFDRCache = new HashMap<>();
+		Map<BigDecimal, BigDecimal> ipFDRCache = new HashMap<>();
 		
 		//
 		// Define the peptide and PSM data
@@ -275,7 +300,7 @@ public class XMLBuilder {
 
 					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_SCORE );
 					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
-					xmlFilterablePsmAnnotation.setValue( psm.getPpProbability() );
+					xmlFilterablePsmAnnotation.setValue( psm.getPeptideProphetProbability() );
 				}
 				
 				
@@ -287,15 +312,49 @@ public class XMLBuilder {
 					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
 					
 					BigDecimal error = null;
-					if( psmFDRCache.containsKey( psm.getPpProbability() ) ) {
-						error = psmFDRCache.get( psm.getPpProbability() );
+					if( ppFDRCache.containsKey( psm.getPeptideProphetProbability() ) ) {
+						error = ppFDRCache.get( psm.getPeptideProphetProbability() );
 					} else {
-						error = errorAnalysis.getError( psm.getPpProbability() );
-						psmFDRCache.put( psm.getPpProbability(), error );
+						error = ppErrorAnalysis.getError( psm.getPeptideProphetProbability() );
+						ppFDRCache.put( psm.getPeptideProphetProbability(), error );
 					}
 					
 					xmlFilterablePsmAnnotation.setValue( error );
 				}
+				
+				// handle interprophet scores
+				if( tppResults.isHasIProphetResults() ) {
+					
+					{
+						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.IPROPHET_ANNOTATION_TYPE_SCORE );
+						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_INTERPROPHET );
+						xmlFilterablePsmAnnotation.setValue( psm.getInterProphetProbability() );
+					}
+					
+					
+					{
+						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.IPROPHET_ANNOTATION_TYPE_FDR );
+						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_INTERPROPHET );
+						
+						BigDecimal error = null;
+						if( ipFDRCache.containsKey( psm.getInterProphetProbability() ) ) {
+							error = ipFDRCache.get( psm.getInterProphetProbability() );
+						} else {
+							error = ipErrorAnalysis.getError( psm.getInterProphetProbability() );
+							ipFDRCache.put( psm.getInterProphetProbability(), error );
+						}
+						
+						xmlFilterablePsmAnnotation.setValue( error );
+					}
+					
+				}
+				
 				
 			}// end iterating over psms for a reported peptide
 		

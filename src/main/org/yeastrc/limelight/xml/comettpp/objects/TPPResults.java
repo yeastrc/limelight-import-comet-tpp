@@ -4,8 +4,9 @@ import java.util.Map;
 
 public class TPPResults {
 
+	private boolean hasIProphetResults;
 	private String cometVersion;
-	private String peptideProphetVersion;
+	private String tppVersion;
 	private Map<TPPReportedPeptide, Map<Integer, TPPPSM>> peptidePSMMap;
 	
 	/**
@@ -21,18 +22,6 @@ public class TPPResults {
 		this.cometVersion = cometVersion;
 	}
 	/**
-	 * @return the peptideProphetVersion
-	 */
-	public String getPeptideProphetVersion() {
-		return peptideProphetVersion;
-	}
-	/**
-	 * @param peptideProphetVersion the peptideProphetVersion to set
-	 */
-	public void setPeptideProphetVersion(String peptideProphetVersion) {
-		this.peptideProphetVersion = peptideProphetVersion;
-	}
-	/**
 	 * @return the peptidePSMMap
 	 */
 	public Map<TPPReportedPeptide, Map<Integer, TPPPSM>> getPeptidePSMMap() {
@@ -44,5 +33,19 @@ public class TPPResults {
 	public void setPeptidePSMMap(Map<TPPReportedPeptide, Map<Integer, TPPPSM>> peptidePSMMap) {
 		this.peptidePSMMap = peptidePSMMap;
 	}
+	public String getTppVersion() {
+		return tppVersion;
+	}
+	public void setTppVersion(String tppVersion) {
+		this.tppVersion = tppVersion;
+	}
+	public boolean isHasIProphetResults() {
+		return hasIProphetResults;
+	}
+	public void setHasIProphetResults(boolean hasIProphetResults) {
+		this.hasIProphetResults = hasIProphetResults;
+	}
+
+
 	
 }

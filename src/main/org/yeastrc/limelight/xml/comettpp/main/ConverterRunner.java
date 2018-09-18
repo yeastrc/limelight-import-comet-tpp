@@ -23,8 +23,8 @@ import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.ConversionParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
 import org.yeastrc.limelight.xml.comettpp.reader.CometParamsReader;
-import org.yeastrc.limelight.xml.comettpp.reader.PeptideProphetErrorAnalysis;
-import org.yeastrc.limelight.xml.comettpp.reader.PeptideProphetErrorAnalyzer;
+import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalysis;
+import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalyzer;
 import org.yeastrc.limelight.xml.comettpp.reader.TPPResultsParser;
 
 public class ConverterRunner {
@@ -44,11 +44,18 @@ public class ConverterRunner {
 		System.err.println( " Done." );
 		
 		System.err.print( "Performing FDR analysis of PeptideProphet probability scores..." );
-		PeptideProphetErrorAnalysis errorAnalysis = PeptideProphetErrorAnalyzer.performAnalysis( tppResults );
+		TPPErrorAnalysis ppErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis( tppResults, TPPErrorAnalyzer.TYPE_PEPTIDE_PROPHET );
 		System.err.println( " Done." );
+		
+		TPPErrorAnalysis ipErrorAnalysis = null;
+		if( tppResults.isHasIProphetResults() ) {
+			System.err.print( "Performing FDR analysis of InterProphet probability scores..." );
+			ipErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis( tppResults, TPPErrorAnalyzer.TYPE_INTER_PROPHET );
+			System.err.println( " Done." );
+		}
 
 		System.err.print( "Writing out XML..." );
-		(new XMLBuilder()).buildAndSaveXML( conversionParameters, tppResults, cometParams, errorAnalysis );
+		(new XMLBuilder()).buildAndSaveXML( conversionParameters, tppResults, cometParams, ppErrorAnalysis, ipErrorAnalysis );
 		System.err.println( " Done." );
 		
 	}

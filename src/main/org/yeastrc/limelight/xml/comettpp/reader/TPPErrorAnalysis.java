@@ -3,7 +3,7 @@ package org.yeastrc.limelight.xml.comettpp.reader;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public class PeptideProphetErrorAnalysis {
+public class TPPErrorAnalysis {
 
 	/**
 	 * Get the error ( sum of 1-p for this probability or better / total count

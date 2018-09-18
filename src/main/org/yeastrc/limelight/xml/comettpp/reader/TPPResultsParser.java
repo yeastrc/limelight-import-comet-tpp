@@ -58,8 +58,10 @@ public class TPPResultsParser {
 		TPPResults results = new TPPResults();
 		results.setPeptidePSMMap( resultMap );
 		
-		results.setPeptideProphetVersion( TPPParsingUtils.getPeptideProphetVersionFromXML( msAnalysis ) );
+		results.setTppVersion( TPPParsingUtils.getTPPVersionFromXML( msAnalysis ) );
 		results.setCometVersion( TPPParsingUtils.getCometVersionFromXML( msAnalysis ) );
+		
+		results.setHasIProphetResults( TPPParsingUtils.getHasIProphetData( msAnalysis ) );
 		
 		
 		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {

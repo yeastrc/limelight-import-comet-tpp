@@ -8,21 +8,42 @@ import org.yeastrc.limelight.xml.comettpp.constants.Constants;
 
 public class PSMAnnotationTypeSortOrder {
 
-	public static List<SearchAnnotation> getPSMAnnotationTypeSortOrder() {
+	public static List<SearchAnnotation> getPSMAnnotationTypeSortOrder( boolean haveIProphetData ) {
 		List<SearchAnnotation> annotations = new ArrayList<SearchAnnotation>();
 		
-		{
-			SearchAnnotation annotation = new SearchAnnotation();
-			annotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_FDR );
-			annotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
-			annotations.add( annotation );
-		}
+		if( haveIProphetData ) {
+			
+			{
+				SearchAnnotation annotation = new SearchAnnotation();
+				annotation.setAnnotationName( PSMAnnotationTypes.IPROPHET_ANNOTATION_TYPE_FDR );
+				annotation.setSearchProgram( Constants.PROGRAM_NAME_INTERPROPHET );
+				annotations.add( annotation );
+			}
+			
+			{
+				SearchAnnotation annotation = new SearchAnnotation();
+				annotation.setAnnotationName( PSMAnnotationTypes.IPROPHET_ANNOTATION_TYPE_SCORE );
+				annotation.setSearchProgram( Constants.PROGRAM_NAME_INTERPROPHET );
+				annotations.add( annotation );
+			}
+			
+		} else {
 		
-		{
-			SearchAnnotation annotation = new SearchAnnotation();
-			annotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_SCORE );
-			annotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
-			annotations.add( annotation );
+		
+			{
+				SearchAnnotation annotation = new SearchAnnotation();
+				annotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_FDR );
+				annotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
+				annotations.add( annotation );
+			}
+			
+			{
+				SearchAnnotation annotation = new SearchAnnotation();
+				annotation.setAnnotationName( PSMAnnotationTypes.PPROPHET_ANNOTATION_TYPE_SCORE );
+				annotation.setSearchProgram( Constants.PROGRAM_NAME_PEPTIDEPROPHET );
+				annotations.add( annotation );
+			}
+			
 		}
 		
 		{
