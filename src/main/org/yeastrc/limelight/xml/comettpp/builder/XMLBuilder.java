@@ -154,7 +154,7 @@ public class XMLBuilder {
 		VisiblePsmAnnotations xmlVisiblePsmAnnotations = new VisiblePsmAnnotations();
 		xmlDefaultVisibleAnnotations.setVisiblePsmAnnotations( xmlVisiblePsmAnnotations );
 
-		for( SearchAnnotation sa : PSMDefaultVisibleAnnotationTypes.getDefaultVisibleAnnotationTypes() ) {
+		for( SearchAnnotation sa : PSMDefaultVisibleAnnotationTypes.getDefaultVisibleAnnotationTypes( tppResults.isHasIProphetResults() ) ) {
 			xmlVisiblePsmAnnotations.getSearchAnnotation().add( sa );
 		}
 		
