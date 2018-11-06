@@ -96,7 +96,13 @@ public class MainProgram {
 		cp.setPepXMLFile( pepXMLFile );
 		cp.setLimelightXMLOutputFile( new File( outFilePath ) );
 
-		ConverterRunner.createInstance().convertCometTPPToLimelightXML( cp );
+		try {
+			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);
+		} catch( Throwable t ) {
+			System.err.println( "Error encountered: " + t.getMessage() );
+			System.exit( 1 );
+		}
+
 		System.exit( 0 );
 	}
 
