@@ -21,6 +21,7 @@ import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPReportedPeptide;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
 import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalysis;
+import org.yeastrc.limelight.xml.comettpp.utils.CometParsingUtils;
 
 public class XMLBuilder {
 
@@ -217,16 +218,28 @@ public class XMLBuilder {
 
 			// add in the mods for this peptide
 			if( tppReportedPeptide.getMods() != null && tppReportedPeptide.getMods().keySet().size() > 0 ) {
-					
+
 				PeptideModifications xmlModifications = new PeptideModifications();
 				xmlReportedPeptide.setPeptideModifications( xmlModifications );
-					
-				for( int position :tppReportedPeptide.getMods().keySet() ) {
+
+				for( int position : tppReportedPeptide.getMods().keySet() ) {
+
 					PeptideModification xmlModification = new PeptideModification();
 					xmlModifications.getPeptideModification().add( xmlModification );
-							
+
 					xmlModification.setMass( tppReportedPeptide.getMods().get( position ) );
-					xmlModification.setPosition( BigInteger.valueOf( position ) );
+
+					if( CometParsingUtils.isNTerminalMod( tppReportedPeptide.getNakedPeptide(), position ) ) {
+
+						xmlModification.setIsNTerminal( true );
+
+					} else if( CometParsingUtils.isCTerminalMod( tppReportedPeptide.getNakedPeptide(), position ) ) {
+
+						xmlModification.setIsCTerminal( true );
+
+					} else {
+						xmlModification.setPosition( BigInteger.valueOf( position ) );
+					}
 				}
 			}
 

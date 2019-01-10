@@ -358,19 +358,30 @@ public class TPPParsingUtils {
 	 * @throws Throwable
 	 */
 	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit ) throws Throwable {
-		
+
 		Map<Integer, BigDecimal> modMap = new HashMap<>();
-		
+
 		ModInfoDataType mofo = searchHit.getModificationInfo();
 		if( mofo != null ) {
 			for( ModAminoacidMass mod : mofo.getModAminoacidMass() ) {
-				
+
 				if( mod.getVariable() != null ) {
 					modMap.put( mod.getPosition().intValueExact(), BigDecimal.valueOf( mod.getVariable() ) );
 				}
 			}
+
+			// set n-term mod at position 0
+			if( mofo.getModNtermMass() != null ) {
+				modMap.put( 0, CometParsingUtils.getNTerminalModMass( BigDecimal.valueOf( mofo.getModNtermMass() ) ) );
+			}
+
+			// set c-term mod at peptide_length + 1
+			if( mofo.getModCtermMass() != null ) {
+				modMap.put( searchHit.getPeptide().length() + 1, CometParsingUtils.getCTerminalModMass( BigDecimal.valueOf( mofo.getModNtermMass() ) ) );
+			}
 		}
-		
+
+
 		return modMap;
 	}
 
