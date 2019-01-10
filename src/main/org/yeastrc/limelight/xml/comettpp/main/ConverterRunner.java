@@ -40,7 +40,7 @@ public class ConverterRunner {
 		System.err.println( " Done." );
 		
 		System.err.print( "Reading pepXML data into memory..." );
-		TPPResults tppResults = TPPResultsParser.getTPPResults( conversionParameters.getPepXMLFile() );
+		TPPResults tppResults = TPPResultsParser.getTPPResults( conversionParameters.getPepXMLFile(), cometParams );
 		System.err.println( " Done." );
 		
 		System.err.print( "Performing FDR analysis of PeptideProphet probability scores..." );

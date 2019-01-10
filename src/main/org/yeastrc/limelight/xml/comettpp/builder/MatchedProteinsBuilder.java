@@ -30,87 +30,220 @@ import org.yeastrc.fasta.FASTAReader;
 public class MatchedProteinsBuilder {
 
 	public static MatchedProteinsBuilder getInstance() { return new MatchedProteinsBuilder(); }
-	
+
 	/**
-	 * Add all target proteins from the FASTA file that contain any of the peptides found in the experiment
-	 * to the limelight xml document in the matched proteins sectioni.
-	 * 
+	 * Given the protein names reported by Comet as matches for each peptide, use the FASTA file to build the
+	 * MatchedProteins section of the XML document. Return a mapping of protein names (reported by Comet as
+	 * matches to any peptide) mapped to the id of the MatchedProtein for that name in the MatchedProteins
+	 * section of the XML document. This can be used to populate the matched protein id for reported peptides.
+	 *
 	 * @param limelightInputRoot
 	 * @param fastaFile
-	 * @param decoyIdentifiers
+	 * @param reportedPeptides
+	 * @return
 	 * @throws Exception
 	 */
-	public void buildMatchedProteins( LimelightInput limelightInputRoot, File fastaFile, Collection<TPPReportedPeptide> reportedPeptides ) throws Exception {
-		
+	public Map<String, Integer> buildMatchedProteins( LimelightInput limelightInputRoot, File fastaFile, Collection<TPPReportedPeptide> reportedPeptides ) throws Exception {
+
 		System.err.print( " Matching peptides to proteins..." );
 
-		// the proteins we've found
-		Map<String, Collection<FastaProteinAnnotation>> proteins = getProteins( reportedPeptides, fastaFile );
-		
+		// all protein names matched by any peptide
+		Collection<String> proteinNames = getAllProteinsFromResults( reportedPeptides );
+
+		// find the proteins matched by any of these peptides (map of sequence => fasta annotations
+		Map<String, MatchedProteinInformation> proteins = getProteinsUsingProteinNames( proteinNames, fastaFile );
+
+		{
+			Collection<String> proteinNamesNotFoundInFasta = getProteinNamesNotFoundInFasta(proteinNames, proteins);
+			if (proteinNamesNotFoundInFasta.size() > 0) {
+				throw new Exception("The following protein names were not found in FASTA: " + String.join(", ", proteinNamesNotFoundInFasta));
+			}
+		}
+
+		// map and validate protein names to protein sequence ids
+		Map<String, Integer> proteinNameIdMap = getMatchedProteinIdsForProteinNames( proteins, proteinNames );
+
 		// create the XML and add to root element
 		buildAndAddMatchedProteinsToXML( limelightInputRoot, proteins );
-		
+
+		return proteinNameIdMap;
 	}
-	
+
+	/**
+	 * Return a collection of distinct protein names reported by Comet as a match to any peptide.
+	 *
+	 * @param reportedPeptides
+	 * @return
+	 */
+	private Collection<String> getAllProteinsFromResults( Collection<TPPReportedPeptide> reportedPeptides ) {
+
+		Collection<String> proteinNames = new HashSet<>();
+
+		for( TPPReportedPeptide reportedPeptide : reportedPeptides ) {
+			proteinNames.addAll( reportedPeptide.getProteinNames() );
+		}
+
+		return proteinNames;
+	}
+
+
+	/* ***************** REST OF THIS CAN BE MOVED TO CENTRALIZED LIB **************************** */
+
+
+	private Collection<String> getProteinNamesNotFoundInFasta( Collection<String> proteinNames, Map<String, MatchedProteinInformation>  proteinFastaAnnotations ) {
+
+		Collection<String> proteins = new HashSet<>();
+
+		for( String proteinName : proteinNames ) {
+
+			boolean found = false;
+
+			for( MatchedProteinInformation mpi :proteinFastaAnnotations.values() ) {
+
+				for( FastaProteinAnnotation anno : mpi.getFastaProteinAnnotations() ) {
+
+					if( anno.getName().equals( proteinName ) ) {
+						found = true;
+						break;
+					}
+
+				}
+
+			}
+
+			if( !found ) {
+				proteins.add( proteinName );
+			}
+
+		}
+
+		return proteins;
+
+	}
+
+
+
 	/**
 	 * Do the work of building the matched peptides element and adding to limelight xml root
-	 * 
+	 *
 	 * @param limelightInputRoot
 	 * @param proteins
 	 * @throws Exception
 	 */
-	private void buildAndAddMatchedProteinsToXML( LimelightInput limelightInputRoot, Map<String, Collection<FastaProteinAnnotation>> proteins ) throws Exception {
-		
+	private void buildAndAddMatchedProteinsToXML( LimelightInput limelightInputRoot,
+												  Map<String, MatchedProteinInformation> proteins ) throws Exception {
+
 		MatchedProteins xmlMatchedProteins = new MatchedProteins();
 		limelightInputRoot.setMatchedProteins( xmlMatchedProteins );
-		
+
 		for( String sequence : proteins.keySet() ) {
-			
-			if( proteins.get( sequence ).isEmpty() ) continue;
-			
+
+			Collection<FastaProteinAnnotation> fastaAnnotations = proteins.get( sequence ).getFastaProteinAnnotations();
+
+			if( fastaAnnotations.isEmpty() ) {
+				throw new Exception( "Did not get any fasta annotations (ie, name or description) for sequence: " + sequence );
+			}
+
 			MatchedProtein xmlProtein = new MatchedProtein();
-        	xmlMatchedProteins.getMatchedProtein().add( xmlProtein );
-        	
-        	xmlProtein.setSequence( sequence );
-        	        	
-        	for( FastaProteinAnnotation anno : proteins.get( sequence ) ) {
-        		MatchedProteinLabel xmlMatchedProteinLabel = new MatchedProteinLabel();
-        		xmlProtein.getMatchedProteinLabel().add( xmlMatchedProteinLabel );
-        		
-        		xmlMatchedProteinLabel.setName( anno.getName() );
-        		
-        		if( anno.getDescription() != null )
-        			xmlMatchedProteinLabel.setDescription( anno.getDescription() );
-        			
-        		if( anno.getTaxonomId() != null )
-        			xmlMatchedProteinLabel.setNcbiTaxonomyId( new BigInteger( anno.getTaxonomId().toString() ) );
-        	}
+			xmlMatchedProteins.getMatchedProtein().add( xmlProtein );
+
+			xmlProtein.setSequence( sequence );
+			xmlProtein.setId( BigInteger.valueOf( proteins.get( sequence ).getId() ) );
+
+			for( FastaProteinAnnotation anno : fastaAnnotations ) {
+				MatchedProteinLabel xmlMatchedProteinLabel = new MatchedProteinLabel();
+				xmlProtein.getMatchedProteinLabel().add( xmlMatchedProteinLabel );
+
+				xmlMatchedProteinLabel.setName( anno.getName() );
+
+				if( anno.getDescription() != null )
+					xmlMatchedProteinLabel.setDescription( anno.getDescription() );
+
+				if( anno.getTaxonomId() != null )
+					xmlMatchedProteinLabel.setNcbiTaxonomyId( new BigInteger( anno.getTaxonomId().toString() ) );
+			}
 		}
 	}
-	
+
 
 	/**
-	 * Get a map of the distinct target protein sequences mapped to a collection of target annotations for that sequence
-	 * from the given fasta file, where the sequence contains any of the supplied peptide sequences
-	 * 
-	 * @param allPetpideSequences
-	 * @param fastaFile
-	 * @param decoyIdentifiers
+	 *
+	 * @param proteinSequenceAnnotations
+	 * @param proteinNames
 	 * @return
-	 * @throws Exception
+	 * @throws Exception If more than one protein sequence is matched by any protein name or if no id can be found for a protein name
 	 */
-	private Map<String, Collection<FastaProteinAnnotation>> getProteins( Collection<TPPReportedPeptide> reportedPeptides, File fastaFile ) throws Exception {
-		
-		// get a unique set of naked peptide sequence
-		Collection<String> nakedPeptideSequences = getNakedPeptideSequences( reportedPeptides );
-		Collection<String> remainingPeptideSequences = new HashSet<>( nakedPeptideSequences );
-		
-		Map<String, Collection<FastaProteinAnnotation>> proteinAnnotations = new HashMap<>();
-		
+	private Map<String, Integer> getMatchedProteinIdsForProteinNames( Map<String, MatchedProteinInformation> proteinSequenceAnnotations, Collection<String> proteinNames ) throws Exception {
+
+		Map<String, Integer> proteinNameIdMap = new HashMap<>();
+
+		for( String proteinName : proteinNames ) {
+
+			boolean foundMatch = false;
+
+			for( MatchedProteinInformation mpi : proteinSequenceAnnotations.values() ) {
+
+				for( FastaProteinAnnotation fpa : mpi.getFastaProteinAnnotations() ) {
+
+					if( fpa.getName().equals( proteinName ) ) {
+
+						// if this is true, then we already found a protein sequence with this name. this is ambiguous and we have to fail
+						if( foundMatch ) {
+							throw new Exception( "Found more than one FASTA entry for protein name: " + proteinName );
+						}
+
+						proteinNameIdMap.put( proteinName, mpi.getId() );
+						foundMatch = true;
+
+						break;	// no need to test rest of fasta annos for sequence
+
+					}
+
+				}
+
+			}
+
+			if( !foundMatch ) {
+				throw new Exception( "Could not find FASTA entry for protein name: " + proteinName );
+			}
+
+		}
+
+
+		return proteinNameIdMap;
+	}
+
+	private boolean fastaEntryContainProteinName( String proteinName, FASTAEntry fastaEntry ) {
+
+		for( FASTAHeader header : fastaEntry.getHeaders() ) {
+
+			if( header.getName().equals( proteinName ) ) {
+				return true;
+			}
+
+		}//end iterating over fasta headers
+
+		return false;
+	}
+
+
+	/**
+	 * Get a mapping of protein sequence to the id to use for that sequence (in the MatchedProteins section) and
+	 * the FASTA annotations to use for that protein sequence.
+	 *
+	 * @param proteinNames The collection of distinct protein names reported by Comet as a match for any peptide
+	 * @param fastaFile The FASTA file that was searched.
+	 * @return
+	 * @throws Exception if there is a problem reading the FASTA file
+	 */
+	private Map<String, MatchedProteinInformation> getProteinsUsingProteinNames( Collection<String> proteinNames, File fastaFile ) throws Exception {
+
+		Map<String, MatchedProteinInformation> proteinAnnotations = new HashMap<>();
+
 		FASTAReader fastaReader = null;
-		
+
 		try {
-			
+
 			fastaReader = FASTAReader.getInstance( fastaFile );
 			int count = 0;
 			System.err.println( "" );
@@ -118,138 +251,146 @@ public class MatchedProteinsBuilder {
 			for( FASTAEntry entry = fastaReader.readNext(); entry != null; entry = fastaReader.readNext() ) {
 
 				count++;
+
 				System.err.print( "\tTested " + count + " FASTA entries...\r" );
-				
-				for( String nakedSequence : nakedPeptideSequences ) {
-					
-					if( ProteinInferenceUtils.proteinContainsReportedPeptide( entry.getSequence(), nakedSequence ) ) {
-						
-						// this protein has a matching peptide
-						
+
+				for( String proteinName : proteinNames ) {
+
+					if( fastaEntryContainProteinName( proteinName, entry ) ) {
+
+						String sequence = entry.getSequence();
+
+						MatchedProteinInformation mpi = null;
+						Collection<FastaProteinAnnotation> fastaAnnotations = null;
+
+						if( proteinAnnotations.containsKey( sequence ) ) {
+
+							mpi = proteinAnnotations.get( sequence );
+							fastaAnnotations = mpi.getFastaProteinAnnotations();
+						} else {
+
+							mpi = new MatchedProteinInformation();
+							proteinAnnotations.put(sequence, mpi);
+
+							mpi.setId(count);
+
+							fastaAnnotations = new HashSet<>();
+							mpi.setFastaProteinAnnotations( fastaAnnotations );
+						}
+
 						for( FASTAHeader header : entry.getHeaders() ) {
-							
-							if( !proteinAnnotations.containsKey( entry.getSequence() ) )
-								proteinAnnotations.put( entry.getSequence(), new HashSet<FastaProteinAnnotation>() );
-							
+
 							FastaProteinAnnotation anno = new FastaProteinAnnotation();
 							anno.setName( header.getName() );
 							anno.setDescription( header.getDescription() );
-		            		
-							proteinAnnotations.get( entry.getSequence() ).add( anno );
+
+							fastaAnnotations.add( anno );
 
 						}//end iterating over fasta headers
-						
-						remainingPeptideSequences.remove( nakedSequence );
-						
-					} // end if statement for protein containing peptide
 
-				} // end iterating over peptide sequences
-				
+
+						break;	// don't need to test more protein names, we are including this protein
+
+					}// end headerline matched protein
+
+				}// end iterating over protein nnames
+
 			}// end iterating over fasta entries
-			
-			
-			if( remainingPeptideSequences.size() > 0 ) {
-				System.err.println( "\nError: Not all peptides in the results could be matched to a protein in the FASTA file." );
-				System.err.println( "\tUnmatched peptides:" );
-				for( String s : remainingPeptideSequences ) {
-					System.err.println( "\t\t" + s );
-				}
-			}
-			
+
+
 			System.err.print( "\n" );
-			
-			
+
+
 		} finally {
 			if( fastaReader != null ) {
 				fastaReader.close();
-				fastaReader = null;
 			}
 		}
-		
+
 		return proteinAnnotations;
 	}
-	
-	
 
-	private Collection<String> getNakedPeptideSequences( Collection< TPPReportedPeptide > percolatorPeptides ) {
-		
-		Collection<String> nakedSequences = new HashSet<>();
-		
-		for( TPPReportedPeptide reportedPeptide : percolatorPeptides ) {
-			nakedSequences.add( reportedPeptide.getNakedPeptide() );
+
+	/**
+	 * Information to include for a MatchedProtein (a distinct protein sequence)
+	 */
+	private class MatchedProteinInformation {
+
+		private Collection<FastaProteinAnnotation> fastaProteinAnnotations;
+		private Integer id;
+
+		public Collection<FastaProteinAnnotation> getFastaProteinAnnotations() {
+			return fastaProteinAnnotations;
 		}
-		
-		
-		return nakedSequences;
+
+		public void setFastaProteinAnnotations(Collection<FastaProteinAnnotation> fastaProteinAnnotations) {
+			this.fastaProteinAnnotations = fastaProteinAnnotations;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
 	}
 
-	
-	
+
 	/**
 	 * An annotation for a protein in a Fasta file
-	 * 
+	 *
 	 * @author mriffle
 	 *
 	 */
 	private class FastaProteinAnnotation {
-		
-		public int hashCode() {
-			
-			String hashString = this.getName();
-			
-			if( this.getDescription() != null )
-				hashString += this.getDescription();
-			
-			if( this.getTaxonomId() != null )
-				hashString += this.getTaxonomId().intValue();
-			
-			return hashString.hashCode();
-		}
-		
-		/**
-		 * Return true if name, description and taxonomy are all the same, false otherwise
+
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
 		 */
-		public boolean equals( Object o ) {
-			try {
-				
-				FastaProteinAnnotation otherAnno = (FastaProteinAnnotation)o;
-				
-				if( !this.getName().equals( otherAnno.getName() ) )
-					return false;
-				
-				
-				if( this.getDescription() == null ) {
-					if( otherAnno.getDescription() != null )
-						return false;
-				} else {
-					if( otherAnno.getDescription() == null )
-						return false;
-				}
-				
-				if( !this.getDescription().equals( otherAnno.getDescription() ) )
-					return false;
-				
-				
-				if( this.getTaxonomId() == null ) {
-					if( otherAnno.getTaxonomId() != null )
-						return false;
-				} else {
-					if( otherAnno.getTaxonomId() == null )
-						return false;
-				}
-				
-				if( !this.getTaxonomId().equals( otherAnno.getTaxonomId() ) )
-					return false;
-				
-				
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((description == null) ? 0 : description.hashCode());
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((taxonomId == null) ? 0 : taxonomId.hashCode());
+			return result;
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
 				return true;
-				
-			} catch( Exception e ) {
+			if (obj == null)
 				return false;
-			}
+			if (!(obj instanceof FastaProteinAnnotation))
+				return false;
+			FastaProteinAnnotation other = (FastaProteinAnnotation) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (description == null) {
+				if (other.description != null)
+					return false;
+			} else if (!description.equals(other.description))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (taxonomId == null) {
+				if (other.taxonomId != null)
+					return false;
+			} else if (!taxonomId.equals(other.taxonomId))
+				return false;
+			return true;
 		}
 
-		
 		public String getName() {
 			return name;
 		}
@@ -269,12 +410,16 @@ public class MatchedProteinsBuilder {
 			this.taxonomId = taxonomId;
 		}
 
-		
-		
+
+
 		private String name;
 		private String description;
 		private Integer taxonomId;
-		
+		private MatchedProteinsBuilder getOuterType() {
+			return MatchedProteinsBuilder.this;
+		}
+
+
 	}
 	
 }

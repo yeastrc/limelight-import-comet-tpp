@@ -1,6 +1,7 @@
 package org.yeastrc.limelight.xml.comettpp.objects;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Map;
 
 public class TPPPSM {
@@ -29,7 +30,17 @@ public class TPPPSM {
 	
 	private BigDecimal peptideProphetFDR;
 	private BigDecimal interProphetFDR;
-	
+
+	private Collection proteinNames;
+
+	public Collection getProteinNames() {
+		return proteinNames;
+	}
+
+	public void setProteinNames(Collection proteinNames) {
+		this.proteinNames = proteinNames;
+	}
+
 	/**
 	 * @return the xCorr
 	 */

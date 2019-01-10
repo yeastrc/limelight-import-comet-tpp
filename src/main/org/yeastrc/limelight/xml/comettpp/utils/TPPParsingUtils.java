@@ -4,12 +4,15 @@ import static java.lang.Math.toIntExact;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 
 import net.systemsbiology.regis_web.pepxml.AltProteinDataType;
@@ -106,31 +109,33 @@ public class TPPParsingUtils {
 		
 		return false;
 	}
-	
+
 
 	/**
 	 * Return true if this searchHit is a decoy. This means that it only matches
 	 * decoy proteins.
-	 * 
+	 *
 	 * @param searchHit
 	 * @return
 	 */
-	public static boolean searchHitIsDecoy( SearchHit searchHit ) {
-		
+	public static boolean searchHitIsDecoy( SearchHit searchHit, CometParameters cometParams ) {
+
 		String protein = searchHit.getProtein();
-		if( protein.startsWith( "DECOY_" ) ) {
-			
+
+		if( CometParsingUtils.isDecoyProtein( protein, cometParams ) ) {
+
 			if( searchHit.getAlternativeProtein() != null ) {
 				for( AltProteinDataType ap : searchHit.getAlternativeProtein() ) {
-					if( !ap.getProtein().startsWith( "DECOY_" ) ) {
+
+					if( !CometParsingUtils.isDecoyProtein( ap.getProtein(), cometParams ) ) {
 						return false;
 					}
 				}
 			}
-			
-			return true;			
+
+			return true;
 		}
-		
+
 		return false;
 	}
 	
@@ -189,21 +194,27 @@ public class TPPParsingUtils {
 	public static int getChargeFromSpectrumQuery( SpectrumQuery spectrumQuery ) {
 		return spectrumQuery.getAssumedCharge().intValue();
 	}
-	
+
 	/**
 	 * Get a TPPPSM (psm object) from the supplied searchHit JAXB object.
-	 * 
+	 *
 	 * If the searchHit has no peptideprophet score, null is returned.
-	 * 
-	 * @param spectrumQuery
+	 * @param searchHit
+	 * @param charge
+	 * @param scanNumber
+	 * @param obsMass
+	 * @param retentionTime
+	 * @param cometParams
 	 * @return
+	 * @throws Throwable
 	 */
 	public static TPPPSM getPsmFromSearchHit(
 			SearchHit searchHit,
 			int charge,
 			int scanNumber,
 			BigDecimal obsMass,
-			BigDecimal retentionTime ) throws Throwable {
+			BigDecimal retentionTime,
+			CometParameters cometParams ) throws Throwable {
 				
 		TPPPSM psm = new TPPPSM();
 		
@@ -231,6 +242,17 @@ public class TPPParsingUtils {
 		// this will set this to null if this was not an iProphet run
 		psm.setInterProphetProbability( getInterProphetProbabilityForSearchHit( searchHit ) );
 
+		try {
+			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, cometParams ) );
+		} catch( Throwable t ) {
+
+			String error = "Error getting protein names for PSM.\n";
+			error += "Psm: " + psm + "\n";
+			error += "Error: " + t.getMessage();
+
+			System.err.println( error );
+			throw t;
+		}
 		
 		try {
 			psm.setModifications( getModificationsForSearchHit( searchHit ) );
@@ -242,12 +264,13 @@ public class TPPParsingUtils {
 		
 		return psm;
 	}
-	
+
 	/**
 	 * Get a PeptideProphet probability from the supplied searchHit JAXB object
-	 * 
-	 * @param spectrumQuery
+	 *
+	 * @param searchHit
 	 * @return
+	 * @throws Exception
 	 */
 	public static BigDecimal getPeptideProphetProbabilityForSearchHit( SearchHit searchHit ) throws Exception {
 		
@@ -273,12 +296,13 @@ public class TPPParsingUtils {
 		
 		return null;
 	}
-	
+
 	/**
 	 * Get a PeptideProphet probability from the supplied searchHit JAXB object
-	 * 
-	 * @param spectrumQuery
+	 *
+	 * @param searchHit
 	 * @return
+	 * @throws Exception
 	 */
 	public static BigDecimal getInterProphetProbabilityForSearchHit( SearchHit searchHit ) throws Exception {
 		
@@ -304,14 +328,15 @@ public class TPPParsingUtils {
 		
 		return null;
 	}
-	
-	
-	
+
+
 	/**
 	 * Get the requested score from the searchHit JAXB object
-	 * 
-	 * @param spectrumQuery
+	 *
+	 * @param searchHit
+	 * @param type
 	 * @return
+	 * @throws Throwable
 	 */
 	public static BigDecimal getScoreForType( SearchHit searchHit, String type ) throws Throwable {
 		
@@ -324,12 +349,13 @@ public class TPPParsingUtils {
 		
 		throw new Exception( "Could not find a score of name: " + type + " for PSM..." );		
 	}
-	
+
 	/**
 	 * Get the variable modifications from the supplied searchHit JAXB object
-	 * 
-	 * @param spectrumQuery
+	 *
+	 * @param searchHit
 	 * @return
+	 * @throws Throwable
 	 */
 	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit ) throws Throwable {
 		
@@ -346,6 +372,39 @@ public class TPPParsingUtils {
 		}
 		
 		return modMap;
+	}
+
+	/**
+	 * Get the protein names reported for this search hit
+	 *
+	 * @param searchHit
+	 * @param cometParams
+	 * @return
+	 * @throws Throwable
+	 */
+	public static Collection<String> getProteinNamesForSearchHit(SearchHit searchHit, CometParameters cometParams ) throws Throwable {
+
+		Collection<String> proteins = new HashSet<>();
+
+		if( searchHit.getProtein() != null && !CometParsingUtils.isDecoyProtein( searchHit.getProtein(), cometParams ) ) {
+			proteins.add( searchHit.getProtein());
+		}
+
+		if( searchHit.getAlternativeProtein() != null && searchHit.getAlternativeProtein().size() > 0 ) {
+
+			for( AltProteinDataType apdt : searchHit.getAlternativeProtein() ) {
+				if( !CometParsingUtils.isDecoyProtein( apdt.getProtein(), cometParams ) ) {
+					proteins.add( apdt.getProtein() );
+				}
+			}
+
+		}
+
+		if( proteins.size() < 1 ) {
+			throw new Exception( "Found zero target proteins for searchHit." );
+		}
+
+		return proteins;
 	}
 	
 	

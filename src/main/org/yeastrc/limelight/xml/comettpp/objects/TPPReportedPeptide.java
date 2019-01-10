@@ -1,6 +1,7 @@
 package org.yeastrc.limelight.xml.comettpp.objects;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Map;
 
 public class TPPReportedPeptide {
@@ -38,7 +39,16 @@ public class TPPReportedPeptide {
 	private String reportedPeptideString;
 	private String nakedPeptide;
 	private Map<Integer, BigDecimal> mods;
-	
+	private Collection<String> proteinNames;
+
+	public Collection<String> getProteinNames() {
+		return proteinNames;
+	}
+
+	public void setProteinNames(Collection<String> proteinNames) {
+		this.proteinNames = proteinNames;
+	}
+
 	/**
 	 * @return the reportedPeptideString
 	 */

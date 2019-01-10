@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPReportedPeptide;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
@@ -42,7 +43,7 @@ import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.S
  */
 public class TPPResultsParser {
 
-	public static TPPResults getTPPResults( File pepXMLFile ) throws Throwable {
+	public static TPPResults getTPPResults(File pepXMLFile, CometParameters cometParams ) throws Throwable {
 
 		Map<TPPReportedPeptide,Map<Integer,TPPPSM>> resultMap = new HashMap<>();
 				
@@ -76,7 +77,7 @@ public class TPPResultsParser {
 					for( SearchHit searchHit : searchResult.getSearchHit() ) {
 						
 						// do not include decoy hits
-						if( TPPParsingUtils.searchHitIsDecoy( searchHit ) ) {
+						if( TPPParsingUtils.searchHitIsDecoy( searchHit, cometParams ) ) {
 							continue;
 						}
 						
@@ -84,7 +85,7 @@ public class TPPResultsParser {
 						
 						try {
 							
-							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime );
+							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, cometParams );
 							
 						} catch( Throwable t) {
 							
