@@ -313,6 +313,14 @@ public class XMLBuilder {
 					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_COMET );
 					xmlFilterablePsmAnnotation.setValue( psm.getxCorr() );
 				}
+				{
+					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.COMET_ANNOTATION_TYPE_MASS_DIFF );
+					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_COMET );
+					xmlFilterablePsmAnnotation.setValue( psm.getMassDiff() );
+				}
 
 
 				// handle peptide prophet scores

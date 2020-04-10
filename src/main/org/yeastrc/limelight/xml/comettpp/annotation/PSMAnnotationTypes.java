@@ -19,7 +19,8 @@ public class PSMAnnotationTypes {
 	public static final String COMET_ANNOTATION_TYPE_SPSCORE = "Sp Score";
 	public static final String COMET_ANNOTATION_TYPE_SPRANK = "Sp Rank";
 	public static final String COMET_ANNOTATION_TYPE_EXPECT = "E-Value";
-	
+	public static final String COMET_ANNOTATION_TYPE_MASS_DIFF = "Mass Diff";
+
 	// PeptideProphet scores
 	public static final String PPROPHET_ANNOTATION_TYPE_SCORE = "Probability Score";
 	public static final String PPROPHET_ANNOTATION_TYPE_FDR = "Calculated FDR";
@@ -83,6 +84,15 @@ public class PSMAnnotationTypes {
 				type.setDescription( "The e-value, or the estimation of the chance of observing a hit of this quality by chance." );
 				type.setFilterDirection( FilterDirectionType.BELOW );
 				
+				types.add( type );
+			}
+
+			{
+				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+				type.setName( COMET_ANNOTATION_TYPE_MASS_DIFF );
+				type.setDescription( "Mass difference between observed and calculated m/z" );
+				type.setFilterDirection( FilterDirectionType.BELOW );
+
 				types.add( type );
 			}
 			

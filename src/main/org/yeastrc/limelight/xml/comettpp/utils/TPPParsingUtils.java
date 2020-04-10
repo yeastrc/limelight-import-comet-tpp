@@ -224,7 +224,7 @@ public class TPPParsingUtils {
 		psm.setRetentionTime( retentionTime );
 		
 		psm.setPeptideSequence( searchHit.getPeptide() );
-		
+		psm.setMassDiff(searchHit.getMassdiff());
 		psm.setxCorr( getScoreForType( searchHit, "xcorr" ) );
 		psm.setDeltaCn( getScoreForType( searchHit, "deltacn" ) );
 		psm.setDeltaCnStar( getScoreForType( searchHit, "deltacnstar" ) );

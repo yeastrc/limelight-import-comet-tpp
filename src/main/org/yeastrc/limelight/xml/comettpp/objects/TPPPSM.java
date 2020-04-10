@@ -12,6 +12,7 @@ public class TPPPSM {
 	private BigDecimal spScore;
 	private BigDecimal spRank;
 	private BigDecimal eValue;
+	private BigDecimal massDiff;
 	
 	private BigDecimal peptideProphetProbability;
 	private BigDecimal interProphetProbability;
@@ -39,6 +40,31 @@ public class TPPPSM {
 
 	public void setProteinNames(Collection proteinNames) {
 		this.proteinNames = proteinNames;
+	}
+
+	@Override
+	public String toString() {
+		return "TPPPSM{" +
+				"xCorr=" + xCorr +
+				", deltaCn=" + deltaCn +
+				", deltaCnStar=" + deltaCnStar +
+				", spScore=" + spScore +
+				", spRank=" + spRank +
+				", eValue=" + eValue +
+				", massDiff=" + massDiff +
+				", peptideProphetProbability=" + peptideProphetProbability +
+				", interProphetProbability=" + interProphetProbability +
+				", hitRank=" + hitRank +
+				", scanNumber=" + scanNumber +
+				", precursorNeutralMass=" + precursorNeutralMass +
+				", charge=" + charge +
+				", retentionTime=" + retentionTime +
+				", peptideSequence='" + peptideSequence + '\'' +
+				", modifications=" + modifications +
+				", peptideProphetFDR=" + peptideProphetFDR +
+				", interProphetFDR=" + interProphetFDR +
+				", proteinNames=" + proteinNames +
+				'}';
 	}
 
 	/**
@@ -223,6 +249,11 @@ public class TPPPSM {
 		this.interProphetProbability = interProphetProbability;
 	}
 
-	
-	
+	public BigDecimal getMassDiff() {
+		return massDiff;
+	}
+
+	public void setMassDiff(BigDecimal massDiff) {
+		this.massDiff = massDiff;
+	}
 }
