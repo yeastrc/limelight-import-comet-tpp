@@ -25,3 +25,6 @@ hs_err_pid*
 /resources/
 /classes/
 /.idea/
+/limelight-import-crux-tide-percolator.iml
+/.gradle/
+/build/
