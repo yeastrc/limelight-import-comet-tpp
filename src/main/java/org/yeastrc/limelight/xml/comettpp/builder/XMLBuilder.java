@@ -384,6 +384,12 @@ public class XMLBuilder {
 					}
 					
 				}
+
+				if(conversionParameters.isOpenMod()) {
+					PsmOpenModification xmlPsmOpenMod = new PsmOpenModification();
+					xmlPsmOpenMod.setMass(psm.getMassDiff());
+					xmlPsm.setPsmOpenModification(xmlPsmOpenMod);
+				}
 				
 				
 			}// end iterating over psms for a reported peptide

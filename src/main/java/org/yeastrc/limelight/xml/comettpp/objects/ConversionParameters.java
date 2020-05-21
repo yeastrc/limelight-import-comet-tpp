@@ -82,11 +82,20 @@ public class ConversionParameters {
 	public void setConversionProgramInfo(ConversionProgramInfo conversionProgramInfo) {
 		this.conversionProgramInfo = conversionProgramInfo;
 	}
-	
+
+	public boolean isOpenMod() {
+		return isOpenMod;
+	}
+
+	public void setOpenMod(boolean openMod) {
+		isOpenMod = openMod;
+	}
+
 	private File fastaFile;
 	private File cometParametersFile;
 	private File limelightXMLOutputFile;
 	private File pepXMLFile;
 	private ConversionProgramInfo conversionProgramInfo;
-	
+	private boolean isOpenMod;
+
 }

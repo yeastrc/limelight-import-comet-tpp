@@ -93,6 +93,7 @@ public class MainProgram implements Runnable {
 		cp.setCometParametersFile( cometParamsFile );
 		cp.setPepXMLFile( pepXMLFile );
 		cp.setLimelightXMLOutputFile( outFile );
+		cp.setOpenMod(isOpenMod);
 
 		try {
 			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);
