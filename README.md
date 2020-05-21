@@ -14,17 +14,34 @@ How To Run
 Command line documentation
 ---------------------------
 
-Usage: java -jar cometTPP2LimelightXML.jar.jar -c path -p path -f path -o path
+```
+java -jar cometTPP2LimelightXML.jar [-hvV] [--open-mod] -c=<cometParamsFile>
+                                    -f=<fastaFile> -o=<outFile> -p=<pepXMLFile>
 
-Example: java -jar magnum2LimelightXML.jar -c /path/to/comet.params
-                                       -o /path/to/output.limelight.xml
-                                       -p /path/to/pepXML.xml
-                                       -f /path/to/fasta.fa
+Description:
+
+Convert the results of a Comet + TPP analysis to a Limelight XML file suitable
+for import into Limelight.
+
+More info at: https://github.com/yeastrc/limelight-import-comet-tpp
 
 Options:
-```
-        -c      [Required] Path to comet .params file
-        -o      [Required] Path to use for the limelight XML output file
-        -f      [Required] Path to FASTA file used in the experiment.
-        -p      [Required] Path to pepXML file
+  -c, --comet-params=<cometParamsFile>
+                             Full path to the comet params file
+  -f, --fasta-file=<fastaFile>
+                             Full path to FASTA file used in the experiment. E.g.,
+                               /data/yeast.fa If not supplied, comet.params will be
+                               used to find FASTA file.
+  -p, --pepxml-file=<pepXMLFile>
+                             Full path to pepXML file
+  -o, --out-file=<outFile>   Full path to use for the Limelight XML output file. E.
+                               g., /data/my_analysis/crux.limelight.xml
+  -v, --verbose              If this parameter is present, error messages will
+                               include a full stacktrace. Helpful for debugging.
+      --open-mod             If this parameter is present, the converter will run in
+                               open mod mode. Mass diffs on the PSMs will be treated
+                               as an unlocalized modification mass for the peptide.
+  -h, --help                 Show this help message and exit.
+  -V, --version              Print version information and exit.
+
 ```
