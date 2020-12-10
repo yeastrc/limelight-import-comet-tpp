@@ -227,7 +227,12 @@ public class TPPParsingUtils {
 		psm.setMassDiff(searchHit.getMassdiff());
 		psm.setxCorr( getScoreForType( searchHit, "xcorr" ) );
 		psm.setDeltaCn( getScoreForType( searchHit, "deltacn" ) );
-		psm.setDeltaCnStar( getScoreForType( searchHit, "deltacnstar" ) );
+
+		// may not be present
+		try {
+			psm.setDeltaCnStar(getScoreForType(searchHit, "deltacnstar"));
+		} catch(Exception e) { ; }
+
 		psm.setSpScore( getScoreForType( searchHit, "spscore" ) );
 		psm.setSpRank( getScoreForType( searchHit, "sprank" ) );
 		psm.seteValue( getScoreForType( searchHit, "expect" ) );

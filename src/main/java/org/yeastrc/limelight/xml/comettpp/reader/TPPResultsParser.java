@@ -95,6 +95,11 @@ public class TPPResultsParser {
 						}
 						
 						if( psm != null ) {
+
+							if(psm.getDeltaCnStar() == null) {
+								results.setDeltaCNStarPresent( false );
+							}
+
 							TPPReportedPeptide tppRp = ReportedPeptideUtils.getTPPReportedPeptideForTPPPSM( psm );
 							
 							if( !results.getPeptidePSMMap().containsKey( tppRp ) )

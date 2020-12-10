@@ -8,6 +8,7 @@ public class TPPResults {
 	private String cometVersion;
 	private String tppVersion;
 	private Map<TPPReportedPeptide, Map<Integer, TPPPSM>> peptidePSMMap;
+	private boolean deltaCNStarPresent = true;
 	
 	/**
 	 * @return the cometVersion
@@ -46,6 +47,11 @@ public class TPPResults {
 		this.hasIProphetResults = hasIProphetResults;
 	}
 
+	public boolean isDeltaCNStarPresent() {
+		return deltaCNStarPresent;
+	}
 
-	
+	public void setDeltaCNStarPresent(boolean deltaCNStarPresent) {
+		this.deltaCNStarPresent = deltaCNStarPresent;
+	}
 }

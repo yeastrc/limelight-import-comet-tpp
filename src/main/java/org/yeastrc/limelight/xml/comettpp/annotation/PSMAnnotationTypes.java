@@ -29,7 +29,7 @@ public class PSMAnnotationTypes {
 	public static final String IPROPHET_ANNOTATION_TYPE_SCORE = "Probability Score";
 	public static final String IPROPHET_ANNOTATION_TYPE_FDR = "Calculated FDR";
 	
-	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName ) {
+	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, boolean deltaCNStarPresent ) {
 		List<FilterablePsmAnnotationType> types = new ArrayList<FilterablePsmAnnotationType>();
 
 		if( programName.equals( Constants.PROGRAM_NAME_COMET ) ) {
@@ -51,7 +51,7 @@ public class PSMAnnotationTypes {
 				types.add( type );
 			}
 			
-			{
+			if(deltaCNStarPresent) {
 				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
 				type.setName( COMET_ANNOTATION_TYPE_DELTACNSTAR );
 				type.setDescription( "Difference between the XCorr of this PSM and the next best PSM" );
