@@ -382,7 +382,7 @@ public class TPPParsingUtils {
 
 			// set c-term mod at peptide_length + 1
 			if( mofo.getModCtermMass() != null ) {
-				modMap.put( searchHit.getPeptide().length() + 1, CometParsingUtils.getCTerminalModMass( BigDecimal.valueOf( mofo.getModNtermMass() ) ) );
+				modMap.put( searchHit.getPeptide().length() + 1, CometParsingUtils.getCTerminalModMass( BigDecimal.valueOf( mofo.getModCtermMass() ) ) );
 			}
 		}
 
