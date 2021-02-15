@@ -27,7 +27,7 @@ public class TestReportedPeptideUtils_GetRPString {
 	@Test
 	public void test() throws Exception {
 
-		assertEquals( "P[17.33]EPTI[38.54]DE", ReportedPeptideUtils.getReportedPeptideStringForSequenceAndMods( _SEQUENCE, _MODS ) );
+		assertEquals( "P[17.3323]EPTI[38.5382]DE", ReportedPeptideUtils.getReportedPeptideStringForSequenceAndMods( _SEQUENCE, _MODS ) );
 
 	}
 	

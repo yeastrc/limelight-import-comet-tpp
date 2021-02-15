@@ -20,7 +20,7 @@ public class TestReportedPeptideUtils_GetRPStringOutOfBounds {
 		_MODS = new HashMap<>();
 		
 		_MODS.put( 1, new BigDecimal( "17.33234" ) );
-		_MODS.put( 8, new BigDecimal( "38.538222" ) );	//peptide is length 7
+		_MODS.put( 9, new BigDecimal( "38.538222" ) );	//peptide is length 7
 		
 	}
 	
