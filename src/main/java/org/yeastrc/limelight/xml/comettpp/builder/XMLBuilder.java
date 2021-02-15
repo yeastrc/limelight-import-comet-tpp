@@ -22,6 +22,7 @@ import org.yeastrc.limelight.xml.comettpp.objects.TPPReportedPeptide;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
 import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalysis;
 import org.yeastrc.limelight.xml.comettpp.utils.CometParsingUtils;
+import org.yeastrc.limelight.xml.comettpp.utils.MassUtils;
 
 public class XMLBuilder {
 
@@ -259,6 +260,8 @@ public class XMLBuilder {
 
 				xmlPsm.setScanNumber( new BigInteger( String.valueOf( scanNumber ) ) );
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( psm.getCharge() ) ) );
+				xmlPsm.setPrecursorMZ(MassUtils.getObservedMoverZForPsm(psm));
+				xmlPsm.setPrecursorRetentionTime(psm.getRetentionTime());
 
 				// add in the filterable PSM annotations (e.g., score)
 				FilterablePsmAnnotations xmlFilterablePsmAnnotations = new FilterablePsmAnnotations();
