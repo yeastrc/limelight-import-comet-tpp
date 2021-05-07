@@ -8,6 +8,6 @@ public class Constants {
 
 	public static final String CONVERSION_PROGRAM_NAME = "cometTPP2LimelightXML.jar";
 	public static final String CONVERSION_PROGRAM_URI = "https://github.com/yeastrc/limelight-import-comet-tpp";
-	public static final String CONVERSION_PROGRAM_VERSION = "2.4.0";
+	public static final String CONVERSION_PROGRAM_VERSION = "2.4.1";
 	
 }

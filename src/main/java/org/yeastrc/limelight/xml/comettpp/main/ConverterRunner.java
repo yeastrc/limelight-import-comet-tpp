@@ -27,6 +27,8 @@ import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalysis;
 import org.yeastrc.limelight.xml.comettpp.reader.TPPErrorAnalyzer;
 import org.yeastrc.limelight.xml.comettpp.reader.TPPResultsParser;
 
+import java.io.File;
+
 public class ConverterRunner {
 
 	// quickly get a new instance of this class
@@ -56,6 +58,10 @@ public class ConverterRunner {
 
 		System.err.print( "Writing out XML..." );
 		(new XMLBuilder()).buildAndSaveXML( conversionParameters, tppResults, cometParams, ppErrorAnalysis, ipErrorAnalysis );
+		System.err.println( " Done." );
+
+		System.err.print( "Validating Limelight XML..." );
+		LimelightXMLValidator.validateLimelightXML(conversionParameters.getLimelightXMLOutputFile());
 		System.err.println( " Done." );
 		
 	}
