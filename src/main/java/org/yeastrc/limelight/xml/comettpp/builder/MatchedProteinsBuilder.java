@@ -255,6 +255,9 @@ public class MatchedProteinsBuilder {
 
 						String sequence = entry.getSequence();
 
+						// remove any asterisks from the sequence
+						sequence = sequence.replaceAll("\\*", "");
+
 						MatchedProteinInformation mpi = null;
 						Collection<FastaProteinAnnotation> fastaAnnotations = null;
 
