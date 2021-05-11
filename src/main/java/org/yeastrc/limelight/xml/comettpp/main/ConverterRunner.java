@@ -36,29 +36,31 @@ public class ConverterRunner {
 	
 	
 	public void convertCometTPPToLimelightXML( ConversionParameters conversionParameters ) throws Throwable {
-	
-		System.err.print( "Reading comet params into memory..." );
-		CometParameters cometParams = CometParamsReader.getCometParameters( conversionParameters.getCometParametersFile() );
-		System.err.println( " Done." );
-		
-		System.err.print( "Reading pepXML data into memory..." );
-		TPPResults tppResults = TPPResultsParser.getTPPResults( conversionParameters.getPepXMLFile(), cometParams );
-		System.err.println( " Done." );
-		
-		System.err.print( "Performing FDR analysis of PeptideProphet probability scores..." );
-		TPPErrorAnalysis ppErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis( tppResults, TPPErrorAnalyzer.TYPE_PEPTIDE_PROPHET );
-		System.err.println( " Done." );
-		
-		TPPErrorAnalysis ipErrorAnalysis = null;
-		if( tppResults.isHasIProphetResults() ) {
-			System.err.print( "Performing FDR analysis of InterProphet probability scores..." );
-			ipErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis( tppResults, TPPErrorAnalyzer.TYPE_INTER_PROPHET );
-			System.err.println( " Done." );
-		}
 
-		System.err.print( "Writing out XML..." );
-		(new XMLBuilder()).buildAndSaveXML( conversionParameters, tppResults, cometParams, ppErrorAnalysis, ipErrorAnalysis );
-		System.err.println( " Done." );
+		{
+			System.err.print("Reading comet params into memory...");
+			CometParameters cometParams = CometParamsReader.getCometParameters(conversionParameters.getCometParametersFile());
+			System.err.println(" Done.");
+
+			System.err.print("Reading pepXML data into memory...");
+			TPPResults tppResults = TPPResultsParser.getTPPResults(conversionParameters.getPepXMLFile(), cometParams);
+			System.err.println(" Done.");
+
+			System.err.print("Performing FDR analysis of PeptideProphet probability scores...");
+			TPPErrorAnalysis ppErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis(tppResults, TPPErrorAnalyzer.TYPE_PEPTIDE_PROPHET);
+			System.err.println(" Done.");
+
+			TPPErrorAnalysis ipErrorAnalysis = null;
+			if (tppResults.isHasIProphetResults()) {
+				System.err.print("Performing FDR analysis of InterProphet probability scores...");
+				ipErrorAnalysis = TPPErrorAnalyzer.performPeptideProphetAnalysis(tppResults, TPPErrorAnalyzer.TYPE_INTER_PROPHET);
+				System.err.println(" Done.");
+			}
+
+			System.err.print("Writing out XML...");
+			(new XMLBuilder()).buildAndSaveXML(conversionParameters, tppResults, cometParams, ppErrorAnalysis, ipErrorAnalysis);
+			System.err.println(" Done.");
+		}
 
 		System.err.print( "Validating Limelight XML..." );
 		LimelightXMLValidator.validateLimelightXML(conversionParameters.getLimelightXMLOutputFile());
