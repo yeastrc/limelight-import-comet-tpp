@@ -2,10 +2,7 @@ package org.yeastrc.limelight.xml.comettpp.builder;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 import org.yeastrc.limelight.limelight_import.api.xml_dto.LimelightInput;
 import org.yeastrc.limelight.limelight_import.api.xml_dto.MatchedProtein;
@@ -46,7 +43,7 @@ public class MatchedProteinsBuilder {
 		System.err.print( " Matching peptides to proteins..." );
 
 		// all protein names matched by any peptide
-		Collection<String> proteinNames = getAllProteinsFromResults( reportedPeptides );
+		Set<String> proteinNames = getAllProteinsFromResults( reportedPeptides );
 
 		// find the proteins matched by any of these peptides (map of sequence => fasta annotations
 		Map<String, MatchedProteinInformation> proteins = getProteinsUsingProteinNames( proteinNames, fastaFile );
@@ -73,9 +70,9 @@ public class MatchedProteinsBuilder {
 	 * @param reportedPeptides
 	 * @return
 	 */
-	private Collection<String> getAllProteinsFromResults( Collection<TPPReportedPeptide> reportedPeptides ) {
+	private Set<String> getAllProteinsFromResults( Collection<TPPReportedPeptide> reportedPeptides ) {
 
-		Collection<String> proteinNames = new HashSet<>();
+		Set<String> proteinNames = new HashSet<>();
 
 		for( TPPReportedPeptide reportedPeptide : reportedPeptides ) {
 			proteinNames.addAll( reportedPeptide.getProteinNames() );
@@ -171,7 +168,7 @@ public class MatchedProteinsBuilder {
 	 * @return
 	 * @throws Exception If more than one protein sequence is matched by any protein name or if no id can be found for a protein name
 	 */
-	private Map<String, Integer> getMatchedProteinIdsForProteinNames( Map<String, MatchedProteinInformation> proteinSequenceAnnotations, Collection<String> proteinNames ) throws Exception {
+	private Map<String, Integer> getMatchedProteinIdsForProteinNames( Map<String, MatchedProteinInformation> proteinSequenceAnnotations, Set<String> proteinNames ) throws Exception {
 
 		Map<String, Integer> proteinNameIdMap = new HashMap<>();
 
@@ -211,14 +208,13 @@ public class MatchedProteinsBuilder {
 		return proteinNameIdMap;
 	}
 
-	private boolean fastaEntryContainProteinName( String proteinName, FASTAEntry fastaEntry ) {
 
+	private boolean proteinNamesContainFASTAEntry(Set<String> proteinNames, FASTAEntry fastaEntry) {
 		for( FASTAHeader header : fastaEntry.getHeaders() ) {
 
-			if( header.getName().equals( proteinName ) ) {
+			if(proteinNames.contains(header.getName())) {
 				return true;
 			}
-
 		}//end iterating over fasta headers
 
 		return false;
@@ -234,7 +230,7 @@ public class MatchedProteinsBuilder {
 	 * @return
 	 * @throws Exception if there is a problem reading the FASTA file
 	 */
-	private Map<String, MatchedProteinInformation> getProteinsUsingProteinNames( Collection<String> proteinNames, File fastaFile ) throws Exception {
+	private Map<String, MatchedProteinInformation> getProteinsUsingProteinNames(Set<String> proteinNames, File fastaFile ) throws Exception {
 
 		Map<String, MatchedProteinInformation> proteinAnnotations = new HashMap<>();
 
@@ -249,56 +245,46 @@ public class MatchedProteinsBuilder {
 
 				System.err.print( "\tTested " + count + " FASTA entries...\r" );
 
-				for( String proteinName : proteinNames ) {
+				if(proteinNamesContainFASTAEntry(proteinNames, entry)) {
 
-					if( fastaEntryContainProteinName( proteinName, entry ) ) {
+					String sequence = entry.getSequence();
 
-						String sequence = entry.getSequence();
+					// remove any asterisks from the sequence
+					sequence = sequence.replaceAll("\\*", "");
 
-						// remove any asterisks from the sequence
-						sequence = sequence.replaceAll("\\*", "");
+					MatchedProteinInformation mpi = null;
+					Collection<FastaProteinAnnotation> fastaAnnotations = null;
 
-						MatchedProteinInformation mpi = null;
-						Collection<FastaProteinAnnotation> fastaAnnotations = null;
+					if( proteinAnnotations.containsKey( sequence ) ) {
 
-						if( proteinAnnotations.containsKey( sequence ) ) {
+						mpi = proteinAnnotations.get( sequence );
+						fastaAnnotations = mpi.getFastaProteinAnnotations();
+					} else {
 
-							mpi = proteinAnnotations.get( sequence );
-							fastaAnnotations = mpi.getFastaProteinAnnotations();
-						} else {
+						mpi = new MatchedProteinInformation();
+						proteinAnnotations.put(sequence, mpi);
 
-							mpi = new MatchedProteinInformation();
-							proteinAnnotations.put(sequence, mpi);
+						mpi.setId(count);
 
-							mpi.setId(count);
+						fastaAnnotations = new HashSet<>();
+						mpi.setFastaProteinAnnotations( fastaAnnotations );
+					}
 
-							fastaAnnotations = new HashSet<>();
-							mpi.setFastaProteinAnnotations( fastaAnnotations );
-						}
+					for( FASTAHeader header : entry.getHeaders() ) {
 
-						for( FASTAHeader header : entry.getHeaders() ) {
+						FastaProteinAnnotation anno = new FastaProteinAnnotation();
+						anno.setName( header.getName() );
+						anno.setDescription( header.getDescription() );
 
-							FastaProteinAnnotation anno = new FastaProteinAnnotation();
-							anno.setName( header.getName() );
-							anno.setDescription( header.getDescription() );
+						fastaAnnotations.add( anno );
 
-							fastaAnnotations.add( anno );
+					}//end iterating over fasta headers
 
-						}//end iterating over fasta headers
-
-
-						break;	// don't need to test more protein names, we are including this protein
-
-					}// end headerline matched protein
-
-				}// end iterating over protein nnames
+				}
 
 			}// end iterating over fasta entries
 
-
 			System.err.print( "\n" );
-
-
 		}
 
 		return proteinAnnotations;
