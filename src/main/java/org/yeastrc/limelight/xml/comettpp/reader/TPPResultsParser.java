@@ -63,16 +63,25 @@ public class TPPResultsParser {
 		results.setCometVersion( TPPParsingUtils.getCometVersionFromXML( msAnalysis ) );
 		
 		results.setHasIProphetResults( TPPParsingUtils.getHasIProphetData( msAnalysis ) );
-		
-		
+
+		int runCounter = 0;
 		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
+
+			runCounter++;
+			if(runCounter > 1) {
+				results.setHasSubSearches(true);
+			}
+
+			String subSearchName = new File(runSummary.getBaseName()).getName();
+
 			for( SpectrumQuery spectrumQuery : runSummary.getSpectrumQuery() ) {
 				
 				int charge = TPPParsingUtils.getChargeFromSpectrumQuery( spectrumQuery );
 				int scanNumber = TPPParsingUtils.getScanNumberFromSpectrumQuery( spectrumQuery );
 				BigDecimal neutralMass = TPPParsingUtils.getNeutralMassFromSpectrumQuery( spectrumQuery );
 				BigDecimal retentionTime = TPPParsingUtils.getRetentionTimeFromSpectrumQuery( spectrumQuery );
-				
+				String scanFilename = TPPParsingUtils.getScanFilenameFromSpectrumQuery(spectrumQuery);
+
 				for( SearchResult searchResult : spectrumQuery.getSearchResult() ) {
 					for( SearchHit searchHit : searchResult.getSearchHit() ) {
 						
@@ -86,7 +95,12 @@ public class TPPResultsParser {
 						try {
 							
 							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, cometParams );
-							
+
+							if(psm != null) {
+								psm.setSubSearchName(subSearchName);
+								psm.setScanFileName(scanFilename);
+							}
+
 						} catch( Throwable t) {
 							
 							System.err.println( "Error reading PSM from pepXML. Error: " + t.getMessage() );

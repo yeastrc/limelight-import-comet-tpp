@@ -9,7 +9,16 @@ public class TPPResults {
 	private String tppVersion;
 	private Map<TPPReportedPeptide, Map<Integer, TPPPSM>> peptidePSMMap;
 	private boolean deltaCNStarPresent = true;
-	
+	private boolean hasSubSearches = false;
+
+	public boolean isHasSubSearches() {
+		return hasSubSearches;
+	}
+
+	public void setHasSubSearches(boolean hasSubSearches) {
+		this.hasSubSearches = hasSubSearches;
+	}
+
 	/**
 	 * @return the cometVersion
 	 */

@@ -99,6 +99,11 @@ public class MainProgram implements Runnable {
 			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);
 		} catch( Throwable t ) {
 			System.err.println( "Error encountered: " + t.getMessage() );
+
+			if(verboseRequested) {
+				t.printStackTrace();
+			}
+
 			System.exit( 1 );
 		}
 

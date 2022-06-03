@@ -18,8 +18,7 @@ public class TPPPSM {
 	private BigDecimal interProphetProbability;
 	
 	private int hitRank;
-	
-	
+
 	private int scanNumber;
 	private BigDecimal precursorNeutralMass;
 	private int charge;
@@ -33,6 +32,8 @@ public class TPPPSM {
 	private BigDecimal interProphetFDR;
 
 	private Collection proteinNames;
+	private String subSearchName;
+	private String scanFileName;
 
 	public Collection getProteinNames() {
 		return proteinNames;
@@ -64,6 +65,8 @@ public class TPPPSM {
 				", peptideProphetFDR=" + peptideProphetFDR +
 				", interProphetFDR=" + interProphetFDR +
 				", proteinNames=" + proteinNames +
+				", subSearchName='" + subSearchName + '\'' +
+				", scanFileName='" + scanFileName + '\'' +
 				'}';
 	}
 
@@ -97,6 +100,23 @@ public class TPPPSM {
 	public BigDecimal getDeltaCnStar() {
 		return deltaCnStar;
 	}
+
+	public String getSubSearchName() {
+		return subSearchName;
+	}
+
+	public void setSubSearchName(String subSearchName) {
+		this.subSearchName = subSearchName;
+	}
+
+	public String getScanFileName() {
+		return scanFileName;
+	}
+
+	public void setScanFileName(String scanFileName) {
+		this.scanFileName = scanFileName;
+	}
+
 	/**
 	 * @param deltaCnStar the deltaCnStar to set
 	 */
