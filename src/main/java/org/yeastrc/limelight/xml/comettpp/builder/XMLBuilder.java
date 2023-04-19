@@ -180,7 +180,11 @@ public class XMLBuilder {
 		Map<String, Integer> proteinNameIds = MatchedProteinsBuilder.getInstance().buildMatchedProteins(
 				limelightInputRoot,
 				conversionParameters.getFastaFile(),
-				tppResults.getPeptidePSMMap().keySet()
+				tppResults.getPeptidePSMMap().keySet(),
+				conversionParameters.isImportDecoys(),
+				cometParameters.getDecoyPrefix(),
+				conversionParameters.getIndependentDecoyPrefix() != null,
+				conversionParameters.getIndependentDecoyPrefix()
 		);
 
 		//
@@ -262,6 +266,22 @@ public class XMLBuilder {
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( psm.getCharge() ) ) );
 				xmlPsm.setPrecursorMZ(MassUtils.getObservedMoverZForPsm(psm));
 				xmlPsm.setPrecursorRetentionTime(psm.getRetentionTime());
+
+				if(conversionParameters.isImportDecoys()) {
+					if (psm.isDecoy()) {
+						xmlPsm.setIsDecoy(true);
+					} else {
+						xmlPsm.setIsDecoy(false);
+					}
+				}
+
+				if(conversionParameters.getIndependentDecoyPrefix() != null) {
+					if (psm.isIndependentDecoy()) {
+						xmlPsm.setIsIndependentDecoy(true);
+					} else {
+						xmlPsm.setIsIndependentDecoy(false);
+					}
+				}
 
 				if(tppResults.isHasSubSearches()) {
 					xmlPsm.setSubgroupName(psm.getSubSearchName());
@@ -404,6 +424,15 @@ public class XMLBuilder {
 		
 		}//end iterating over reported peptides
 
+		// add in the fasta file statistics, if necessary
+		if(conversionParameters.getIndependentDecoyPrefix() != null) {
+			FastaFileStatisticsBuilder.getInstance().buildFastaFileStatistics(
+					limelightInputRoot,
+					conversionParameters.getFastaFile(),
+					cometParameters.getDecoyPrefix(),
+					conversionParameters.getIndependentDecoyPrefix()
+			);
+		}
 		
 		// add in the config file(s)
 		ConfigurationFiles xmlConfigurationFiles = new ConfigurationFiles();

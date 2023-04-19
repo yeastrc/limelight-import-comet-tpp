@@ -38,7 +38,18 @@ public class ConversionProgramInfo {
 		return cpi;
 		
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ConversionProgramInfo{" +
+				"name='" + name + '\'' +
+				", version='" + version + '\'' +
+				", conversionDate=" + conversionDate +
+				", arguments='" + arguments + '\'' +
+				", URI='" + URI + '\'' +
+				'}';
+	}
+
 	private ConversionProgramInfo() { }
 	
 	/**

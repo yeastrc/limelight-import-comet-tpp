@@ -15,6 +15,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
+import org.yeastrc.limelight.xml.comettpp.objects.ConversionParameters;
+import org.yeastrc.limelight.xml.comettpp.objects.ConversionProgramInfo;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 
 import net.systemsbiology.regis_web.pepxml.AltProteinDataType;
@@ -140,7 +142,36 @@ public class TPPParsingUtils {
 
 		return false;
 	}
-	
+
+	/**
+	 * Return true if this searchHit is an independent decoy. This means that it only matches
+	 * independent decoy proteins.
+	 *
+	 * @param searchHit
+	 * @param independentDecoyPrefix
+	 * @return
+	 */
+	public static boolean searchHitIsIndependentDecoy( SearchHit searchHit, String independentDecoyPrefix ) {
+
+		if(independentDecoyPrefix == null) { return false; }
+
+		String protein = searchHit.getProtein();
+		if( protein.startsWith(independentDecoyPrefix ) ) {
+
+			if( searchHit.getAlternativeProtein() != null ) {
+				for( AltProteinDataType ap : searchHit.getAlternativeProtein() ) {
+					if( !ap.getProtein().startsWith(independentDecoyPrefix ) ) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Return the top-most parent element of the pepXML file as a JAXB object.
 	 * 
@@ -236,7 +267,8 @@ public class TPPParsingUtils {
 			int scanNumber,
 			BigDecimal obsMass,
 			BigDecimal retentionTime,
-			CometParameters cometParams ) throws Throwable {
+			CometParameters cometParams,
+			ConversionParameters conversionParameters) throws Throwable {
 				
 		TPPPSM psm = new TPPPSM();
 		
@@ -270,7 +302,7 @@ public class TPPParsingUtils {
 		psm.setInterProphetProbability( getInterProphetProbabilityForSearchHit( searchHit ) );
 
 		try {
-			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, cometParams ) );
+			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, cometParams, conversionParameters ) );
 		} catch( Throwable t ) {
 
 			String error = "Error getting protein names for PSM.\n";
@@ -420,12 +452,14 @@ public class TPPParsingUtils {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static Collection<String> getProteinNamesForSearchHit(SearchHit searchHit, CometParameters cometParams ) throws Throwable {
+	public static Collection<String> getProteinNamesForSearchHit(SearchHit searchHit, CometParameters cometParams, ConversionParameters conversionParameters) throws Throwable {
 
 		Collection<String> proteins = new HashSet<>();
 
-		if( searchHit.getProtein() != null && !CometParsingUtils.isDecoyProtein( searchHit.getProtein(), cometParams ) ) {
-			proteins.add( searchHit.getProtein());
+		if(searchHit.getProtein() != null) {
+			if(conversionParameters.isImportDecoys() || (!conversionParameters.isImportDecoys() && !CometParsingUtils.isDecoyProtein( searchHit.getProtein(), cometParams ))) {
+				proteins.add(searchHit.getProtein());
+			}
 		}
 
 		if( searchHit.getAlternativeProtein() != null && searchHit.getAlternativeProtein().size() > 0 ) {

@@ -55,6 +55,12 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-p", "--pepxml-file" }, required = true, description = "Full path to pepXML file")
 	private File pepXMLFile;
 
+	@CommandLine.Option(names = { "-d", "--import-decoys" }, required = false, description = "If present, decoys will be included in the Limelight XML output.")
+	private boolean importDecoys = false;
+
+	@CommandLine.Option(names = { "-i", "--independent-decoy-prefix" }, required = false, description = "If present, any hits to proteins that begin with this string will be considered \"independent decoys,\" for the purpose of error estimation. See: https://pubmed.ncbi.nlm.nih.gov/21876204/")
+	private String independentDecoyPrefix;
+
 	@CommandLine.Option(names = { "-o", "--out-file" }, required = true, description = "Full path to use for the Limelight XML output file. E.g., /data/my_analysis/crux.limelight.xml")
 	private File outFile;
 
@@ -94,6 +100,8 @@ public class MainProgram implements Runnable {
 		cp.setPepXMLFile( pepXMLFile );
 		cp.setLimelightXMLOutputFile( outFile );
 		cp.setOpenMod(isOpenMod);
+		cp.setImportDecoys(importDecoys);
+		cp.setIndependentDecoyPrefix(independentDecoyPrefix);
 
 		try {
 			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);

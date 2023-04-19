@@ -1,6 +1,7 @@
 package org.yeastrc.limelight.xml.comettpp.reader;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 public class TPPErrorAnalysis {
@@ -39,7 +40,7 @@ public class TPPErrorAnalysis {
 		double error = oneMinusPSum / totalCount;
 		
 		BigDecimal retValue = BigDecimal.valueOf( error );
-		retValue = retValue.setScale(4, BigDecimal.ROUND_HALF_EVEN);
+		retValue = retValue.setScale(4, RoundingMode.HALF_EVEN);
 		
 		return retValue;
 	}

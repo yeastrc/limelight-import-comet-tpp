@@ -23,10 +23,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
-import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
-import org.yeastrc.limelight.xml.comettpp.objects.TPPReportedPeptide;
-import org.yeastrc.limelight.xml.comettpp.objects.TPPResults;
+import org.yeastrc.limelight.xml.comettpp.objects.*;
 import org.yeastrc.limelight.xml.comettpp.utils.ReportedPeptideUtils;
 import org.yeastrc.limelight.xml.comettpp.utils.TPPParsingUtils;
 
@@ -43,7 +40,7 @@ import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.S
  */
 public class TPPResultsParser {
 
-	public static TPPResults getTPPResults(File pepXMLFile, CometParameters cometParams ) throws Throwable {
+	public static TPPResults getTPPResults(File pepXMLFile, CometParameters cometParams, ConversionParameters conversionParameters ) throws Throwable {
 
 		Map<TPPReportedPeptide,Map<Integer,TPPPSM>> resultMap = new HashMap<>();
 				
@@ -84,9 +81,9 @@ public class TPPResultsParser {
 
 				for( SearchResult searchResult : spectrumQuery.getSearchResult() ) {
 					for( SearchHit searchHit : searchResult.getSearchHit() ) {
-						
+
 						// do not include decoy hits
-						if( TPPParsingUtils.searchHitIsDecoy( searchHit, cometParams ) ) {
+						if( !conversionParameters.isImportDecoys() && TPPParsingUtils.searchHitIsDecoy(searchHit, cometParams) ) {
 							continue;
 						}
 						
@@ -94,7 +91,7 @@ public class TPPResultsParser {
 						
 						try {
 							
-							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, cometParams );
+							psm = TPPParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, cometParams, conversionParameters );
 
 							if(psm != null) {
 								psm.setSubSearchName(subSearchName);
@@ -102,13 +99,19 @@ public class TPPResultsParser {
 							}
 
 						} catch( Throwable t) {
-							
 							System.err.println( "Error reading PSM from pepXML. Error: " + t.getMessage() );
 							throw t;
-							
 						}
 						
 						if( psm != null ) {
+
+							if(conversionParameters.isImportDecoys() &&
+									TPPParsingUtils.searchHitIsDecoy(searchHit, cometParams) ) {
+								psm.setDecoy(true);
+							} else if(conversionParameters.getIndependentDecoyPrefix() != null &&
+									TPPParsingUtils.searchHitIsIndependentDecoy( searchHit, conversionParameters.getIndependentDecoyPrefix() ) ) {
+								psm.setIndependentDecoy(true);
+							}
 
 							if(psm.getDeltaCnStar() == null) {
 								results.setDeltaCNStarPresent( false );
@@ -128,5 +131,4 @@ public class TPPResultsParser {
 		
 		return results;
 	}
-	
 }

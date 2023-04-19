@@ -13,7 +13,9 @@ public class TPPPSM {
 	private BigDecimal spRank;
 	private BigDecimal eValue;
 	private BigDecimal massDiff;
-	
+	private boolean isDecoy = false;
+	private boolean isIndependentDecoy = false;
+
 	private BigDecimal peptideProphetProbability;
 	private BigDecimal interProphetProbability;
 	
@@ -31,15 +33,15 @@ public class TPPPSM {
 	private BigDecimal peptideProphetFDR;
 	private BigDecimal interProphetFDR;
 
-	private Collection proteinNames;
+	private Collection<String> proteinNames;
 	private String subSearchName;
 	private String scanFileName;
 
-	public Collection getProteinNames() {
+	public Collection<String> getProteinNames() {
 		return proteinNames;
 	}
 
-	public void setProteinNames(Collection proteinNames) {
+	public void setProteinNames(Collection<String> proteinNames) {
 		this.proteinNames = proteinNames;
 	}
 
@@ -53,6 +55,8 @@ public class TPPPSM {
 				", spRank=" + spRank +
 				", eValue=" + eValue +
 				", massDiff=" + massDiff +
+				", isDecoy=" + isDecoy +
+				", isIndependentDecoy=" + isIndependentDecoy +
 				", peptideProphetProbability=" + peptideProphetProbability +
 				", interProphetProbability=" + interProphetProbability +
 				", hitRank=" + hitRank +
@@ -275,5 +279,21 @@ public class TPPPSM {
 
 	public void setMassDiff(BigDecimal massDiff) {
 		this.massDiff = massDiff;
+	}
+
+	public boolean isDecoy() {
+		return isDecoy;
+	}
+
+	public void setDecoy(boolean decoy) {
+		isDecoy = decoy;
+	}
+
+	public boolean isIndependentDecoy() {
+		return isIndependentDecoy;
+	}
+
+	public void setIndependentDecoy(boolean independentDecoy) {
+		isIndependentDecoy = independentDecoy;
 	}
 }

@@ -33,7 +33,7 @@ public class ReportedPeptideUtils {
 			}
 		}
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < sequence.length(); i++){
 			int position = i + 1;
@@ -63,7 +63,7 @@ public class ReportedPeptideUtils {
 		if( mods.containsKey( sequence.length() + 1 ) ) {
 			BigDecimal v = mods.get( sequence.length() + 1 ).setScale( 4, RoundingMode.HALF_UP );
 
-			sb.append( "c[" + v.toString() + "]" );
+			sb.append("c[").append(v.toString()).append("]");
 		}
 
 

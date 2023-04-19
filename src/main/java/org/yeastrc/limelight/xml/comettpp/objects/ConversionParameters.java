@@ -21,7 +21,21 @@ package org.yeastrc.limelight.xml.comettpp.objects;
 import java.io.File;
 
 public class ConversionParameters {
-		
+
+	@Override
+	public String toString() {
+		return "ConversionParameters{" +
+				"fastaFile=" + fastaFile +
+				", cometParametersFile=" + cometParametersFile +
+				", limelightXMLOutputFile=" + limelightXMLOutputFile +
+				", pepXMLFile=" + pepXMLFile +
+				", conversionProgramInfo=" + conversionProgramInfo +
+				", isOpenMod=" + isOpenMod +
+				", importDecoys=" + importDecoys +
+				", independentDecoyPrefix='" + independentDecoyPrefix + '\'' +
+				'}';
+	}
+
 	/**
 	 * @return the fastaFile
 	 */
@@ -91,11 +105,29 @@ public class ConversionParameters {
 		isOpenMod = openMod;
 	}
 
+	public boolean isImportDecoys() {
+		return importDecoys;
+	}
+
+	public void setImportDecoys(boolean importDecoys) {
+		this.importDecoys = importDecoys;
+	}
+
+	public String getIndependentDecoyPrefix() {
+		return independentDecoyPrefix;
+	}
+
+	public void setIndependentDecoyPrefix(String independentDecoyPrefix) {
+		this.independentDecoyPrefix = independentDecoyPrefix;
+	}
+
 	private File fastaFile;
 	private File cometParametersFile;
 	private File limelightXMLOutputFile;
 	private File pepXMLFile;
 	private ConversionProgramInfo conversionProgramInfo;
 	private boolean isOpenMod;
+	private boolean importDecoys = false;
+	private String independentDecoyPrefix;
 
 }
