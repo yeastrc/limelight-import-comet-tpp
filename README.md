@@ -15,8 +15,10 @@ Command line documentation
 ---------------------------
 
 ```
-java -jar cometTPP2LimelightXML.jar [-hvV] [--open-mod] -c=<cometParamsFile>
-                                    -f=<fastaFile> -o=<outFile> -p=<pepXMLFile>
+java -jar cometTPP2LimelightXML.jar [-dhvV] [--open-mod] -c=<cometParamsFile>
+                                    -f=<fastaFile>
+                                    [-i=<independentDecoyPrefix>] -o=<outFile>
+                                    -p=<pepXMLFile>
 
 Description:
 
@@ -34,6 +36,13 @@ Options:
                                used to find FASTA file.
   -p, --pepxml-file=<pepXMLFile>
                              Full path to pepXML file
+  -d, --import-decoys        If present, decoys will be included in the Limelight
+                               XML output.
+  -i, --independent-decoy-prefix=<independentDecoyPrefix>
+                             If present, any hits to proteins that begin with this
+                               string will be considered "independent decoys," for
+                               the purpose of error estimation. See: https://pubmed.
+                               ncbi.nlm.nih.gov/21876204/
   -o, --out-file=<outFile>   Full path to use for the Limelight XML output file. E.
                                g., /data/my_analysis/crux.limelight.xml
   -v, --verbose              If this parameter is present, error messages will
@@ -43,5 +52,4 @@ Options:
                                as an unlocalized modification mass for the peptide.
   -h, --help                 Show this help message and exit.
   -V, --version              Print version information and exit.
-
 ```
