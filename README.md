@@ -37,7 +37,8 @@ Options:
   -p, --pepxml-file=<pepXMLFile>
                              Full path to pepXML file
   -d, --import-decoys        If present, decoys will be included in the Limelight
-                               XML output.
+                               XML output. Note: PeptideProphet must be run with
+                               MINPROB=0 in order to output decoy hits.
   -i, --independent-decoy-prefix=<independentDecoyPrefix>
                              If present, any hits to proteins that begin with this
                                string will be considered "independent decoys," for
