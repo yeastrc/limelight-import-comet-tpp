@@ -55,7 +55,7 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-p", "--pepxml-file" }, required = true, description = "Full path to pepXML file")
 	private File pepXMLFile;
 
-	@CommandLine.Option(names = { "-d", "--import-decoys" }, required = false, description = "If present, decoys will be included in the Limelight XML output.")
+	@CommandLine.Option(names = { "-d", "--import-decoys" }, required = false, description = "If present, decoys will be included in the Limelight XML output. Note: PeptideProphet must be run with MINPROB=0 in order to output decoy hits.")
 	private boolean importDecoys = false;
 
 	@CommandLine.Option(names = { "-i", "--independent-decoy-prefix" }, required = false, description = "If present, any hits to proteins that begin with this string will be considered \"independent decoys,\" for the purpose of error estimation. See: https://pubmed.ncbi.nlm.nih.gov/21876204/")
