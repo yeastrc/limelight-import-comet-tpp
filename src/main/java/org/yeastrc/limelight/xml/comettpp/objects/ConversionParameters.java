@@ -121,6 +121,14 @@ public class ConversionParameters {
 		this.independentDecoyPrefix = independentDecoyPrefix;
 	}
 
+	public String[] getComments() {
+		return comments;
+	}
+
+	public void setComments(String[] comments) {
+		this.comments = comments;
+	}
+
 	private File fastaFile;
 	private File cometParametersFile;
 	private File limelightXMLOutputFile;
@@ -129,5 +137,6 @@ public class ConversionParameters {
 	private boolean isOpenMod;
 	private boolean importDecoys = false;
 	private String independentDecoyPrefix;
+	private String[] comments;
 
 }

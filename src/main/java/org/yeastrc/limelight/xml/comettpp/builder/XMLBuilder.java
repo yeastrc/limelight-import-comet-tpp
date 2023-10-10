@@ -45,7 +45,17 @@ public class XMLBuilder {
 		
 		SearchPrograms searchPrograms = new SearchPrograms();
 		searchProgramInfo.setSearchPrograms( searchPrograms );
-		
+
+		// add in any comments
+		if(conversionParameters.getComments() != null && conversionParameters.getComments().length > 0) {
+			SearchComments xSearchComments = new SearchComments();
+			limelightInputRoot.setSearchComments(xSearchComments);
+
+			for(String searchComment : conversionParameters.getComments()) {
+				xSearchComments.getSearchComment().add(searchComment);
+			}
+		}
+
 		if( tppResults.isHasIProphetResults() ) {
 			SearchProgram searchProgram = new SearchProgram();
 			searchPrograms.getSearchProgram().add( searchProgram );

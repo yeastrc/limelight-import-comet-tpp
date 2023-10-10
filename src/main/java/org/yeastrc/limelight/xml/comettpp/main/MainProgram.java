@@ -70,6 +70,9 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "--open-mod" }, required = false, description = "If this parameter is present, the converter will run in open mod mode. Mass diffs on the PSMs will be treated as an unlocalized modification mass for the peptide.")
 	private boolean isOpenMod = false;
 
+	@CommandLine.Option(names = { "--add-comment" }, required = false, description = "Use this parameter to optionally add comments to the search. Can be used multiple times.")
+	private String[] comments;
+
 	private String[] args;
 
 	public void run() {
@@ -102,6 +105,7 @@ public class MainProgram implements Runnable {
 		cp.setOpenMod(isOpenMod);
 		cp.setImportDecoys(importDecoys);
 		cp.setIndependentDecoyPrefix(independentDecoyPrefix);
+		cp.setComments(comments);
 
 		try {
 			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);
