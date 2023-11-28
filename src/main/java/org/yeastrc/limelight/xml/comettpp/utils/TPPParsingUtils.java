@@ -14,19 +14,12 @@ import java.util.regex.Pattern;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import net.systemsbiology.regis_web.pepxml.*;
 import org.yeastrc.limelight.xml.comettpp.objects.CometParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.ConversionParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.ConversionProgramInfo;
 import org.yeastrc.limelight.xml.comettpp.objects.TPPPSM;
 
-import net.systemsbiology.regis_web.pepxml.AltProteinDataType;
-import net.systemsbiology.regis_web.pepxml.InterprophetResult;
-import net.systemsbiology.regis_web.pepxml.InterprophetSummary;
-import net.systemsbiology.regis_web.pepxml.ModInfoDataType;
-import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis;
-import net.systemsbiology.regis_web.pepxml.NameValueType;
-import net.systemsbiology.regis_web.pepxml.PeptideprophetResult;
-import net.systemsbiology.regis_web.pepxml.PeptideprophetSummary;
 import net.systemsbiology.regis_web.pepxml.ModInfoDataType.ModAminoacidMass;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.AnalysisSummary;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary;
@@ -111,6 +104,30 @@ public class TPPParsingUtils {
 			}
 		}
 		
+		return false;
+	}
+
+	/**
+	 * Return true if the results can be expected to have PTMProphet data, false otherwise.
+	 *
+	 * @param msAnalysis
+	 * @return
+	 */
+	public static boolean getHasPTMProphetData( MsmsPipelineAnalysis msAnalysis ) {
+
+		for( AnalysisSummary analysisSummary : msAnalysis.getAnalysisSummary() ) {
+
+			for( Object o : analysisSummary.getAny() ) {
+
+				try {
+					PtmprophetSummary pps = (PtmprophetSummary)o;
+					return true;
+
+				} catch( Throwable t ) { ; }
+
+			}
+		}
+
 		return false;
 	}
 
