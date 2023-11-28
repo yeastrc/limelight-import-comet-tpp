@@ -424,18 +424,18 @@ public class TPPParsingUtils {
 		if( mofo != null ) {
 			for( ModAminoacidMass mod : mofo.getModAminoacidMass() ) {
 
-				if( mod.getVariable() != null ) {
+				if( mod.getVariable() != null && mod.getVariable() != 0 ) {
 					modMap.put( mod.getPosition().intValueExact(), BigDecimal.valueOf( mod.getVariable() ) );
 				}
 			}
 
 			// set n-term mod at position 0
-			if( mofo.getModNtermMass() != null ) {
+			if( mofo.getModNtermMass() != null && mofo.getModNtermMass() != 0 ) {
 				modMap.put( 0, CometParsingUtils.getNTerminalModMass( BigDecimal.valueOf( mofo.getModNtermMass() ) ) );
 			}
 
 			// set c-term mod at peptide_length + 1
-			if( mofo.getModCtermMass() != null ) {
+			if( mofo.getModCtermMass() != null && mofo.getModCtermMass() != 0 ) {
 				modMap.put( searchHit.getPeptide().length() + 1, CometParsingUtils.getCTerminalModMass( BigDecimal.valueOf( mofo.getModCtermMass() ) ) );
 			}
 		}
