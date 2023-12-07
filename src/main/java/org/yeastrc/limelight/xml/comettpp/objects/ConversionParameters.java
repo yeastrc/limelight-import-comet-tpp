@@ -129,6 +129,14 @@ public class ConversionParameters {
 		this.comments = comments;
 	}
 
+	public double getModificationLocalizationProbabilityFilter() {
+		return modificationLocalizationProbabilityFilter;
+	}
+
+	public void setModificationLocalizationProbabilityFilter(double modificationLocalizationProbabilityFilter) {
+		this.modificationLocalizationProbabilityFilter = modificationLocalizationProbabilityFilter;
+	}
+
 	private File fastaFile;
 	private File cometParametersFile;
 	private File limelightXMLOutputFile;
@@ -138,5 +146,6 @@ public class ConversionParameters {
 	private boolean importDecoys = false;
 	private String independentDecoyPrefix;
 	private String[] comments;
+	private double modificationLocalizationProbabilityFilter;
 
 }

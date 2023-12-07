@@ -46,6 +46,9 @@ import picocli.CommandLine;
  */
 public class MainProgram implements Runnable {
 
+	@CommandLine.Option(names = { "--mod-loc-prob-filter" }, required = false, description = "If set, no PSM will be included if the PTMProphet localization probability of any modification is less than this value. Default: 0.8." )
+	private Double modLocalizationProbabilityFilter = 0.8;
+
 	@CommandLine.Option(names = { "-c", "--comet-params" }, required = true, description = "Full path to the comet params file")
 	private File cometParamsFile;
 
@@ -106,6 +109,7 @@ public class MainProgram implements Runnable {
 		cp.setImportDecoys(importDecoys);
 		cp.setIndependentDecoyPrefix(independentDecoyPrefix);
 		cp.setComments(comments);
+		cp.setModificationLocalizationProbabilityFilter(modLocalizationProbabilityFilter);
 
 		try {
 			ConverterRunner.createInstance().convertCometTPPToLimelightXML(cp);

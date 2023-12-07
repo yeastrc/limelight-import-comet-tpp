@@ -337,9 +337,89 @@ public class TPPParsingUtils {
 			System.err.println( "Error getting mods for PSM. Error was: " + t.getMessage() );
 			throw t;
 		}
+
+		// check if the probabilities for mod localization meets the requested cutoff
+		if(!checkModLocalizationProbabilities(psm, searchHit, conversionParameters)) {
+			return null;
+		}
 		
 		return psm;
 	}
+
+	/**
+	 * Returns
+	 * @param searchHit
+	 * @param conversionParameters
+	 * @return
+	 */
+	private static boolean checkModLocalizationProbabilities(TPPPSM psm, SearchHit searchHit, ConversionParameters conversionParameters) {
+
+		if(psm.getModifications() == null || psm.getModifications().size() < 1) {
+			return true;
+		}
+
+		for( AnalysisResult ar : searchHit.getAnalysisResult() ) {
+			if( ar.getAnalysis().equals( "ptmprophet" ) ) {
+
+				for( Object o : ar.getAny() ) {
+
+					try {
+
+						PtmprophetResult ppr = (PtmprophetResult)o;
+						BigDecimal modMass = getModMassFromPTMProphetResult(ppr.getPtm());
+
+						for(PtmprophetResult.ModAminoacidProbability modAminoacidProbability : ppr.getModAminoacidProbability()) {
+							int position = modAminoacidProbability.getPosition().intValueExact();
+							if(psm.getModifications().containsKey(position) && areEqualWithSmallerScaleRounding(psm.getModifications().get(position), modMass)) {
+
+								// if this a mod at a position predicted for this PSM and its probability is lower than our cutoff, return false
+								if(modAminoacidProbability.getProbability().doubleValue() < conversionParameters.getModificationLocalizationProbabilityFilter()) {
+									return false;
+								}
+							} else {
+								throw new RuntimeException("Mod masses do not match at same position:" + modMass + ", " + psm.getModifications().get(position));
+							}
+						}
+
+					} catch( Throwable t ) {
+
+					}
+				}
+			}
+		}
+
+
+		// should I also check that all mods in the PSM had a PTM prophet prediction I checked?
+
+		return true;
+	}
+
+	/**
+	 * Compares two BigDecimal values for equality after rounding one of them to the smaller scale of the two.
+	 *
+	 * @param value1 the first BigDecimal value
+	 * @param value2 the second BigDecimal value
+	 * @return true if the values are equal after rounding
+	 */
+	private static boolean areEqualWithSmallerScaleRounding(BigDecimal value1, BigDecimal value2) {
+		int smallerScale = Math.min(value1.scale(), value2.scale());
+
+		BigDecimal roundedValue1 = value1.setScale(smallerScale, BigDecimal.ROUND_HALF_UP);
+		BigDecimal roundedValue2 = value2.setScale(smallerScale, BigDecimal.ROUND_HALF_UP);
+
+		return roundedValue1.compareTo(roundedValue2) == 0;
+	}
+
+
+	private static BigDecimal getModMassFromPTMProphetResult(String ptmProphetResultPtm) {
+		String[] fields = ptmProphetResultPtm.split(":");
+		if(fields.length != 2) {
+			throw new RuntimeException("PTMProphet Result ptm parameter did not have expected format. Got: " + ptmProphetResultPtm);
+		}
+
+		return new BigDecimal(fields[1]);
+	}
+
 
 	/**
 	 * Get a PeptideProphet probability from the supplied searchHit JAXB object
