@@ -363,26 +363,22 @@ public class TPPParsingUtils {
 
 				for( Object o : ar.getAny() ) {
 
-					try {
+					if(o instanceof PtmprophetResult) {
 
-						PtmprophetResult ppr = (PtmprophetResult)o;
+						PtmprophetResult ppr = (PtmprophetResult) o;
 						BigDecimal modMass = getModMassFromPTMProphetResult(ppr.getPtm());
 
-						for(PtmprophetResult.ModAminoacidProbability modAminoacidProbability : ppr.getModAminoacidProbability()) {
+						for (PtmprophetResult.ModAminoacidProbability modAminoacidProbability : ppr.getModAminoacidProbability()) {
 							int position = modAminoacidProbability.getPosition().intValueExact();
-							if(psm.getModifications().containsKey(position) && areEqualWithSmallerScaleRounding(psm.getModifications().get(position), modMass)) {
+							if (psm.getModifications().containsKey(position) && areEqualWithSmallerScaleRounding(psm.getModifications().get(position), modMass)) {
 
 								// if this a mod at a position predicted for this PSM and its probability is lower than our cutoff, return false
-								if(modAminoacidProbability.getProbability().doubleValue() < conversionParameters.getModificationLocalizationProbabilityFilter()) {
+								if (modAminoacidProbability.getProbability().doubleValue() < conversionParameters.getModificationLocalizationProbabilityFilter()) {
+									//System.err.println("Throwing out PSM: " + psm);
 									return false;
 								}
-							} else {
-								throw new RuntimeException("Mod masses do not match at same position:" + modMass + ", " + psm.getModifications().get(position));
 							}
 						}
-
-					} catch( Throwable t ) {
-
 					}
 				}
 			}
@@ -393,6 +389,7 @@ public class TPPParsingUtils {
 
 		return true;
 	}
+
 
 	/**
 	 * Compares two BigDecimal values for equality after rounding one of them to the smaller scale of the two.
