@@ -85,37 +85,29 @@ public class MatchedProteinsBuilder {
 	/* ***************** REST OF THIS CAN BE MOVED TO CENTRALIZED LIB **************************** */
 
 
-	private Collection<String> getProteinNamesNotFoundInFasta( Collection<String> proteinNames, Map<String, MatchedProteinInformation>  proteinFastaAnnotations ) {
+	private Collection<String> getProteinNamesNotFoundInFasta(Collection<String> proteinNames, Map<String, MatchedProteinInformation> proteinFastaAnnotations) {
+		// Create a set to store all unique protein names from FASTA annotations
+		Set<String> fastaNames = new HashSet<>();
 
-		Collection<String> proteins = new HashSet<>();
-
-		for( String proteinName : proteinNames ) {
-
-			boolean found = false;
-
-			for( MatchedProteinInformation mpi :proteinFastaAnnotations.values() ) {
-
-				for( FastaProteinAnnotation anno : mpi.getFastaProteinAnnotations() ) {
-
-					if( anno.getName().equals( proteinName ) ) {
-						found = true;
-						break;
-					}
-
-				}
-
+		// Populate the set with names from all FASTA annotations
+		for (MatchedProteinInformation mpi : proteinFastaAnnotations.values()) {
+			for (FastaProteinAnnotation anno : mpi.getFastaProteinAnnotations()) {
+				fastaNames.add(anno.getName());
 			}
-
-			if( !found ) {
-				proteins.add( proteinName );
-			}
-
 		}
 
-		return proteins;
+		// Create a collection to store proteins not found in FASTA annotations
+		Collection<String> proteinsNotFound = new HashSet<>();
 
+		// Check which protein names are not present in the FASTA names set
+		for (String proteinName : proteinNames) {
+			if (!fastaNames.contains(proteinName)) {
+				proteinsNotFound.add(proteinName);
+			}
+		}
+
+		return proteinsNotFound;
 	}
-
 
 
 	/**
@@ -248,19 +240,14 @@ public class MatchedProteinsBuilder {
 						foundMatch = true;
 
 						break;	// no need to test rest of fasta annos for sequence
-
 					}
-
 				}
-
 			}
 
 			if( !foundMatch ) {
 				throw new Exception( "Could not find FASTA entry for protein name: " + proteinName );
 			}
-
 		}
-
 
 		return proteinNameIdMap;
 	}
