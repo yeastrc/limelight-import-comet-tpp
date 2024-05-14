@@ -217,36 +217,32 @@ public class MatchedProteinsBuilder {
 	 * @return
 	 * @throws Exception If more than one protein sequence is matched by any protein name or if no id can be found for a protein name
 	 */
-	private Map<String, Integer> getMatchedProteinIdsForProteinNames( Map<String, MatchedProteinInformation> proteinSequenceAnnotations, Set<String> proteinNames ) throws Exception {
-
+	private Map<String, Integer> getMatchedProteinIdsForProteinNames(Map<String, MatchedProteinInformation> proteinSequenceAnnotations, Set<String> proteinNames) throws Exception {
 		Map<String, Integer> proteinNameIdMap = new HashMap<>();
+		Map<String, Integer> nameToIdMap = new HashMap<>();
 
-		for( String proteinName : proteinNames ) {
-
-			boolean foundMatch = false;
-
-			for( MatchedProteinInformation mpi : proteinSequenceAnnotations.values() ) {
-
-				for( FastaProteinAnnotation fpa : mpi.getFastaProteinAnnotations() ) {
-
-					if( fpa.getName().equals( proteinName ) ) {
-
-						// if this is true, then we already found a protein sequence with this name. this is ambiguous and we have to fail
-						if( foundMatch ) {
-							throw new Exception( "Found more than one FASTA entry for protein name: " + proteinName );
-						}
-
-						proteinNameIdMap.put( proteinName, mpi.getId() );
-						foundMatch = true;
-
-						break;	// no need to test rest of fasta annos for sequence
+		// First pass to collect identifiers and detect duplicates
+		for (Map.Entry<String, MatchedProteinInformation> entry : proteinSequenceAnnotations.entrySet()) {
+			MatchedProteinInformation mpi = entry.getValue();
+			for (FastaProteinAnnotation fpa : mpi.getFastaProteinAnnotations()) {
+				String proteinName = fpa.getName();
+				if (nameToIdMap.containsKey(proteinName)) {
+					if (!nameToIdMap.get(proteinName).equals(mpi.getId())) {
+						throw new Exception("Found more than one FASTA entry for protein name: " + proteinName);
 					}
+				} else {
+					nameToIdMap.put(proteinName, mpi.getId());
 				}
 			}
+		}
 
-			if( !foundMatch ) {
-				throw new Exception( "Could not find FASTA entry for protein name: " + proteinName );
+		// Second pass to validate all provided protein names are found and have a unique id
+		for (String proteinName : proteinNames) {
+			Integer id = nameToIdMap.get(proteinName);
+			if (id == null) {
+				throw new Exception("Could not find FASTA entry for protein name: " + proteinName);
 			}
+			proteinNameIdMap.put(proteinName, id);
 		}
 
 		return proteinNameIdMap;
