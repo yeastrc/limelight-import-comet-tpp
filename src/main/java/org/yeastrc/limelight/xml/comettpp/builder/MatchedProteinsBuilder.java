@@ -291,10 +291,7 @@ public class MatchedProteinsBuilder {
 
 				if(proteinNamesContainFASTAEntry(proteinNames, entry)) {
 
-					String sequence = entry.getSequence();
-
-					// remove any asterisks from the sequence
-					sequence = sequence.replaceAll("\\*", "");
+					String sequence = entry.getSequence().replace("*", "");
 
 					MatchedProteinInformation mpi = null;
 					Collection<FastaProteinAnnotation> fastaAnnotations = null;
