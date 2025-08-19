@@ -10,6 +10,7 @@ on:
 env:
   EXECUTABLE_JAR: "cometTPP2LimelightXML.jar"
   DOCKER_REPO: "mriffle/comet-tpp-to-limelight"
+  LIMELIGHT_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   dockerhub:
@@ -23,8 +24,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew shadowJar
       - name: Login to DockerHub

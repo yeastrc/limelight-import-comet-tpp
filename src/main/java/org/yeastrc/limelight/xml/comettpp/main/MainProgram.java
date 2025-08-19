@@ -25,12 +25,13 @@ import java.io.InputStreamReader;
 import org.yeastrc.limelight.xml.comettpp.constants.Constants;
 import org.yeastrc.limelight.xml.comettpp.objects.ConversionParameters;
 import org.yeastrc.limelight.xml.comettpp.objects.ConversionProgramInfo;
+import org.yeastrc.limelight.xml.comettpp.utils.Limelight_GetVersion_FromFile_SetInBuildFromEnvironmentVariable;
 
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "java -jar " + Constants.CONVERSION_PROGRAM_NAME,
 		mixinStandardHelpOptions = true,
-		version = Constants.CONVERSION_PROGRAM_NAME + " " + Constants.CONVERSION_PROGRAM_VERSION,
+		versionProvider = LimelightConverterVersionProvider.class,
 		sortOptions = false,
 		synopsisHeading = "%n",
 		descriptionHeading = "%n@|bold,underline Description:|@%n%n",
@@ -94,7 +95,20 @@ public class MainProgram implements Runnable {
 			System.exit( 1 );
 		}
 
-		ConversionProgramInfo cpi = ConversionProgramInfo.createInstance( String.join( " ",  args ) );        
+		ConversionProgramInfo cpi = null;
+		
+		try {
+			cpi = ConversionProgramInfo.createInstance( String.join( " ",  args ) );        
+		} catch(Throwable t) {
+
+			System.err.println("Error running conversion: " + t.getMessage());
+
+			if(verboseRequested) {
+				t.printStackTrace();
+			}
+
+			System.exit(1);
+		}
 
 		ConversionParameters cp = new ConversionParameters();
 		cp.setConversionProgramInfo( cpi );
@@ -143,7 +157,7 @@ public class MainProgram implements Runnable {
 			while ( ( line = br.readLine() ) != null ) {
 
 				line = line.replace( "{{URL}}", Constants.CONVERSION_PROGRAM_URI );
-				line = line.replace( "{{VERSION}}", Constants.CONVERSION_PROGRAM_VERSION );
+				line = line.replace( "{{VERSION}}", Limelight_GetVersion_FromFile_SetInBuildFromEnvironmentVariable.getVersion_FromFile_SetInBuildFromEnvironmentVariable() );
 
 				System.err.println( line );
 				
